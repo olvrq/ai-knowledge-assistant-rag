@@ -359,7 +359,7 @@ export default function AIKnowledgeApp() {
               <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Status da Conexão com Banco Vetorial</h3>
               <div className={`space-y-3 text-xs ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                 <div className={`flex justify-between p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                  <span>Função RPC: <code className={`px-1.5 py-0.5 rounded-md border font-semibold ${isDarkMode ? 'bg-purple-950 text-purple-100 border-purple-800' : 'bg-purple-100 text-purple-900 border-purple-200'}`}>match_document_chunks</code></span>
+                  <span>Função RPC: <code className={`font-semibold ${isDarkMode ? 'px-1.5 py-0.5 rounded-md border bg-purple-950 text-purple-100 border-purple-800' : 'bg-transparent text-purple-900'}`}>match_document_chunks</code></span>
                   <span className="text-emerald-500 font-medium">Operacional (Latência: 42ms)</span>
                 </div>
                 <div className={`flex justify-between p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
