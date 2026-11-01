@@ -53,8 +53,15 @@ class Settings:
     BACKEND_HOST: str = os.getenv("BACKEND_HOST", "127.0.0.1")
     BACKEND_PORT: int = int(os.getenv("BACKEND_PORT", "8000"))
 
-    # CORS Origins (Comma-separated list in production, e.g., https://your-app.streamlit.app)
-    CORS_ALLOWED_ORIGINS_RAW: str = os.getenv("CORS_ALLOWED_ORIGINS", "*").strip()
+    # CORS Origins (Restricts to official Streamlit Cloud domain and localhost)
+    DEFAULT_CORS_ORIGINS: str = (
+        "https://ai-knowledge-assistant-ragg.streamlit.app,"
+        "http://localhost:8501,"
+        "http://127.0.0.1:8501"
+    )
+    CORS_ALLOWED_ORIGINS_RAW: str = os.getenv(
+        "CORS_ALLOWED_ORIGINS", DEFAULT_CORS_ORIGINS
+    ).strip()
 
     # Supabase & pgvector
     SUPABASE_URL: str = os.getenv("SUPABASE_URL", "").strip()
@@ -115,9 +122,12 @@ class Settings:
 
     @property
     def cors_allowed_origins(self) -> list[str]:
-        if not self.CORS_ALLOWED_ORIGINS_RAW or self.CORS_ALLOWED_ORIGINS_RAW == "*":
+        raw = self.CORS_ALLOWED_ORIGINS_RAW
+        if not raw or (raw == "*" and self.IS_PRODUCTION):
+            raw = self.DEFAULT_CORS_ORIGINS
+        if raw == "*":
             return ["*"]
-        return [o.strip() for o in self.CORS_ALLOWED_ORIGINS_RAW.split(",") if o.strip()]
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
     @property
     def is_supabase_configured(self) -> bool:
