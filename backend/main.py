@@ -96,8 +96,19 @@ def _resolve_client_key(request: Request, user: Optional[UserInfo]) -> str:
 
 
 # -----------------------------------------------------------------------------
-# HEALTH & PIPELINE STATUS
+# ROOT & HEALTH STATUS
 # -----------------------------------------------------------------------------
+@app.get("/", tags=["System"])
+async def root_status() -> dict[str, str]:
+    return {
+        "service": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "status": "online",
+        "docs_url": "/docs",
+        "health_url": "/api/health",
+    }
+
+
 @app.get("/api/health", response_model=PipelineStatusResponse, tags=["System"])
 async def health_check() -> PipelineStatusResponse:
     return _build_pipeline_status()
