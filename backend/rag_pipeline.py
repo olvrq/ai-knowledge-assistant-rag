@@ -326,77 +326,102 @@ def synthesize_rag_answer(
     )
 
     gemini_error_note: Optional[str] = None
+    candidate_models: list[str] = [
+        settings.GEMINI_LLM_MODEL,
+        "gemini-flash-latest",
+        "gemini-2.5-flash-lite",
+    ]
 
     # 1. Try LangChain ChatGoogleGenerativeAI when GEMINI_API_KEY is configured
     if settings.is_gemini_configured and LANGCHAIN_GEMINI_AVAILABLE:
-        try:
-            llm = ChatGoogleGenerativeAI(
-                model=settings.GEMINI_LLM_MODEL,
-                temperature=settings.GEMINI_TEMPERATURE,
-                max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
-                google_api_key=settings.GEMINI_API_KEY,
-                max_retries=2,
-            )
-            prompt = ChatPromptTemplate.from_messages(
-                [
-                    ("system", system_instruction),
-                    ("human", "{question}"),
-                ]
-            )
-            chain = prompt | llm
-            result = chain.invoke({"question": question})
-            answer_text = str(result.content).strip()
-            if answer_text:
-                return (
-                    answer_text,
-                    {
-                        "engine": "langchain-google-genai",
-                        "abstained": False,
-                        "retrieved_chunks": len(citations),
-                        "llm_model": settings.GEMINI_LLM_MODEL,
-                        "embedding_model": settings.GEMINI_EMBEDDING_MODEL,
-                        "embedding_dimension": settings.GEMINI_EMBEDDING_DIMENSION,
-                        "vector_store": (
-                            "supabase-pgvector"
-                            if repository.is_supabase_active
-                            else "local-pgvector-mirror"
-                        ),
-                    },
-                )
-        except Exception as exc:
-            gemini_error_note = sanitize_error_message(str(exc))
-
-    # 2. Try google-genai SDK directly if LangChain wrapper failed
-    if settings.is_gemini_configured and GOOGLE_GENAI_SDK_AVAILABLE and gemini_error_note is None:
-        try:
-            client = genai.Client(api_key=settings.GEMINI_API_KEY)
-            resp = client.models.generate_content(
-                model=settings.GEMINI_LLM_MODEL,
-                contents=f"{system_instruction}\n\nPERGUNTA DO USUÁRIO:\n{question}",
-                config=genai_types.GenerateContentConfig(
+        idx = 0
+        while idx < len(candidate_models):
+            active_model = candidate_models[idx]
+            idx += 1
+            try:
+                llm = ChatGoogleGenerativeAI(
+                    model=active_model,
                     temperature=settings.GEMINI_TEMPERATURE,
                     max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
-                ),
-            )
-            if resp and resp.text:
-                return (
-                    resp.text.strip(),
-                    {
-                        "engine": "google-genai-sdk",
-                        "abstained": False,
-                        "retrieved_chunks": len(citations),
-                        "llm_model": settings.GEMINI_LLM_MODEL,
-                        "embedding_model": settings.GEMINI_EMBEDDING_MODEL,
-                        "embedding_dimension": settings.GEMINI_EMBEDDING_DIMENSION,
-                        "vector_store": (
-                            "supabase-pgvector"
-                            if repository.is_supabase_active
-                            else "local-pgvector-mirror"
-                        ),
-                    },
+                    google_api_key=settings.GEMINI_API_KEY,
+                    max_retries=1,
                 )
-        except Exception as exc:
-            gemini_error_note = sanitize_error_message(str(exc))
+                prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", system_instruction),
+                        ("human", "{question}"),
+                    ]
+                )
+                chain = prompt | llm
+                result = chain.invoke({"question": question})
+                raw_content = result.content
+                if isinstance(raw_content, list):
+                    answer_text = "\n".join(
+                        str(part.get("text", part)) if isinstance(part, dict) else str(part)
+                        for part in raw_content
+                    ).strip()
+                else:
+                    answer_text = str(raw_content).strip()
+
+                if answer_text:
+                    return (
+                        answer_text,
+                        {
+                            "engine": "langchain-google-genai",
+                            "abstained": False,
+                            "retrieved_chunks": len(citations),
+                            "llm_model": active_model,
+                            "embedding_model": settings.GEMINI_EMBEDDING_MODEL,
+                            "embedding_dimension": settings.GEMINI_EMBEDDING_DIMENSION,
+                            "vector_store": (
+                                "supabase-pgvector"
+                                if repository.is_supabase_active
+                                else "local-pgvector-mirror"
+                            ),
+                        },
+                    )
+            except Exception as exc:
+                err_str = str(exc)
+                gemini_error_note = sanitize_error_message(err_str)
+                # Dynamically add model suggested by Gemini API 404 message if present
+                match = re.search(r"use models/([a-zA-Z0-9\.\-_]+)", err_str)
+                if match:
+                    suggested_model = match.group(1)
+                    if suggested_model not in candidate_models:
+                        candidate_models.insert(idx, suggested_model)
+
+    # 2. Try google-genai SDK directly if LangChain wrapper failed
+    if settings.is_gemini_configured and GOOGLE_GENAI_SDK_AVAILABLE:
+        for active_model in candidate_models:
+            try:
+                client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                resp = client.models.generate_content(
+                    model=active_model,
+                    contents=f"{system_instruction}\n\nPERGUNTA DO USUÁRIO:\n{question}",
+                    config=genai_types.GenerateContentConfig(
+                        temperature=settings.GEMINI_TEMPERATURE,
+                        max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
+                    ),
+                )
+                if resp and resp.text:
+                    return (
+                        resp.text.strip(),
+                        {
+                            "engine": "google-genai-sdk",
+                            "abstained": False,
+                            "retrieved_chunks": len(citations),
+                            "llm_model": active_model,
+                            "embedding_model": settings.GEMINI_EMBEDDING_MODEL,
+                            "embedding_dimension": settings.GEMINI_EMBEDDING_DIMENSION,
+                            "vector_store": (
+                                "supabase-pgvector"
+                                if repository.is_supabase_active
+                                else "local-pgvector-mirror"
+                            ),
+                        },
+                    )
+            except Exception as exc:
+                gemini_error_note = sanitize_error_message(str(exc))
 
     # 3. Grounded structured RAG synthesis from top retrieved chunks (offline / fallback protection)
     top = citations[0]
