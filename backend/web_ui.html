@@ -110,19 +110,19 @@
         <button
           id="btn-new-chat-expanded"
           onclick="handleStartNewChat()"
-          class="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium shadow-lg shadow-purple-950 transition-all"
+          class="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-2xl text-sm font-medium shadow-lg shadow-purple-950 transition-all"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"/><path d="M12 5v14"/>
           </svg>
-          <span>Nova Conversa</span>
+          <span>+ Nova Conversa</span>
         </button>
 
         <button
           id="btn-new-chat-collapsed"
           onclick="handleStartNewChat()"
-          title="Nova Conversa"
-          class="hidden mx-auto items-center justify-center bg-purple-600 hover:bg-purple-500 text-white w-10 h-10 rounded-xl shadow-md transition-all"
+          title="+ Nova Conversa"
+          class="hidden mx-auto items-center justify-center bg-purple-600 hover:bg-purple-500 text-white w-10 h-10 rounded-2xl shadow-md transition-all"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5 12h14"/><path d="M12 5v14"/>
@@ -137,8 +137,8 @@
         <button
           id="nav-btn-chat"
           onclick="setActiveView('chat')"
-          class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all bg-purple-950/60 text-purple-300 border border-purple-800/40 font-medium"
-          title="Assistente Chat"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm transition-all bg-purple-950/60 text-purple-300 border border-purple-800/40 font-medium"
+          title="💬 Assistente Chat"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-purple-400">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -149,8 +149,8 @@
         <button
           id="nav-btn-dashboard"
           onclick="setActiveView('dashboard')"
-          class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
-          title="Dashboard & Métricas"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
+          title="📊 Dashboard & Métricas"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-purple-400">
             <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
@@ -161,8 +161,8 @@
         <button
           id="nav-btn-documents"
           onclick="setActiveView('documents')"
-          class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
-          title="Biblioteca Documental"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm transition-all text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
+          title="📁 Biblioteca Documental"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-purple-400">
             <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
@@ -178,7 +178,7 @@
       </div>
 
       <!-- Status Inferior do Pipeline RAG -->
-      <div id="sidebar-footer-card" class="p-3 m-3 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-2 text-xs">
+      <div id="sidebar-footer-card" class="p-3 m-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2 text-xs">
         <div class="flex items-center justify-between text-slate-300 font-medium">
           <span class="flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-400">
@@ -191,9 +191,17 @@
           </span>
         </div>
         <p class="text-[11px] text-slate-400 leading-normal">
-          Acervo: <strong id="sidebar-doc-count" class="text-slate-200">3 docs</strong> · <strong id="sidebar-vec-count" class="text-slate-200">4 vetores</strong><br/>
-          Sessão: <span id="sidebar-user-email">admin@knowledge.ai</span>
+          Acervo: <strong id="sidebar-doc-count" class="text-slate-200">4 docs</strong> · <strong id="sidebar-vec-count" class="text-slate-200">13 vetores</strong><br/>
+          Supabase pgvector 768d · <span id="sidebar-user-email">Conectado</span>
         </p>
+      </div>
+      <div
+        id="sidebar-footer-collapsed"
+        onclick="toggleSidebar()"
+        title="Pipeline RAG Ativo · Supabase pgvector 768d Conectado"
+        class="hidden mx-auto mb-4 w-10 h-10 rounded-2xl bg-slate-950/80 border border-slate-800 items-center justify-center cursor-pointer"
+      >
+        <span class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></span>
       </div>
     </aside>
 
@@ -390,7 +398,7 @@
           </form>
           <div class="text-center mt-2">
             <span class="text-[11px] text-slate-500">
-              Respostas fundamentadas nos documentos indexados com citação de fonte · Enter para enviar
+              Respostas fundamentadas nos documentos indexados com citação de fonte
             </span>
           </div>
         </div>
@@ -474,6 +482,7 @@
       const btnNewExpanded = document.getElementById('btn-new-chat-expanded');
       const btnNewCollapsed = document.getElementById('btn-new-chat-collapsed');
       const footerCard = document.getElementById('sidebar-footer-card');
+      const footerCollapsed = document.getElementById('sidebar-footer-collapsed');
       const labels = document.querySelectorAll('.sidebar-label');
 
       if (state.isSidebarOpen) {
@@ -489,6 +498,10 @@
         btnNewCollapsed.classList.add('hidden');
         btnNewCollapsed.classList.remove('flex');
         footerCard.classList.remove('hidden');
+        if (footerCollapsed) {
+          footerCollapsed.classList.add('hidden');
+          footerCollapsed.classList.remove('flex');
+        }
         labels.forEach(el => el.classList.remove('hidden'));
       } else {
         sidebar.classList.remove('w-72');
@@ -503,6 +516,10 @@
         btnNewCollapsed.classList.remove('hidden');
         btnNewCollapsed.classList.add('flex');
         footerCard.classList.add('hidden');
+        if (footerCollapsed) {
+          footerCollapsed.classList.remove('hidden');
+          footerCollapsed.classList.add('flex');
+        }
         labels.forEach(el => el.classList.add('hidden'));
       }
       renderChatHistory();
@@ -567,7 +584,7 @@
       const input = document.getElementById('chat-input');
       input.value = text;
       updateSendButtonState();
-      input.focus();
+      handleSend(new Event('submit'));
     }
 
     function updateSendButtonState() {

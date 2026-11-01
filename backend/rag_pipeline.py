@@ -289,14 +289,13 @@ def synthesize_rag_answer(
     # Strict Abstinence Guardrail: Do not answer or call LLM when no chunks meet similarity threshold
     if not citations:
         return (
-            "### Abstinência por Insuficiência de Evidências Documentais\n\n"
-            "Não foram encontrados fragmentos nos documentos indexados com similaridade semântica suficiente "
-            f"(limiar mínimo configurado: **{int(settings.RAG_MIN_SIMILARITY_THRESHOLD * 100)}%**) "
-            "para responder com segurança a esta pergunta.\n\n"
-            "**Política de Governança RAG:** O assistente abstém-se de formular hipóteses ou utilizar conhecimento "
-            "externo não respaldado pela sua Biblioteca Documental.\n\n"
-            "**Recomendação:** Verifique os termos da pergunta ou envie documentos pertinentes "
-            "(`.pdf`, `.md`, `.txt`, `.docx`) na aba **Biblioteca Documental**.",
+            "Olá! Consultei atentamente todos os documentos da nossa base de conhecimento no Supabase pgvector (`768d`), "
+            "mas **não encontrei evidências suficientes** nos arquivos indexados "
+            f"(limiar mínimo de segurança: **{int(settings.RAG_MIN_SIMILARITY_THRESHOLD * 100)}%**) "
+            "para responder com precisão a essa pergunta.\n\n"
+            "Por compromisso com a governança e para evitar qualquer suposição ou alucinação (abstinência estrita), "
+            "prefiro não arriscar uma resposta sem respaldo documental. Se desejar, você pode clicar em **+ Enviar Documento** "
+            "para adicionar o arquivo correspondente (`.pdf`, `.docx`, `.md` ou `.txt`) ou reformular sua pergunta — terei prazer em ajudar!",
             {
                 "engine": "rag-abstinence-guardrail",
                 "abstained": True,
@@ -316,16 +315,17 @@ def synthesize_rag_answer(
     context_text = "\n\n---\n\n".join(context_blocks)
 
     system_instruction = (
-        "Você é o AI Knowledge Assistant, um especialista em inteligência documental e RAG alimentado pelo Google Gemini.\n"
-        "REGRAS OBRIGATÓRIAS:\n"
-        "1. Responda à pergunta do usuário baseando-se EXCLUSIVAMENTE nos fragmentos documentais fornecidos abaixo.\n"
-        "2. Se os fragmentos fornecidos não contiverem evidências suficientes para responder à pergunta, "
-        "declare explicitamente que não há evidências suficientes nos documentos consultados (abstinência estrita) e NÃO invente informações.\n"
-        "3. Estruture sua resposta em Markdown com:\n"
-        "   - **Síntese Executiva**: Resposta direta e objetiva.\n"
-        "   - **Evidências Documentais**: Detalhamento em tópicos.\n"
-        "4. Inclua obrigatoriamente citações inline no formato `[Fonte: nome_do_arquivo | Trecho #N]` ao final de cada afirmação.\n\n"
-        f"CONTEXTO DOCUMENTAL RECUPERADO:\n{context_text}"
+        "Você é o Knowledge Assistant, um assistente de inteligência documental e RAG alimentado pelo Google Gemini e Supabase pgvector (768d).\n"
+        "COMPORTAMENTO E TOM DE VOZ:\n"
+        "- Responda sempre de forma **humanizada, empática, acolhedora e direta**, como um colega especialista prestativo.\n"
+        "- Vá direto ao ponto com clareza, cordialidade e linguagem fluida, evitando jargões robóticos desnecessários.\n"
+        "REGRAS RÍGIDAS DE GOVERNANÇA E ANTI-ALUCINAÇÃO:\n"
+        "1. Baseie sua resposta EXCLUSIVAMENTE no contexto dos documentos recuperados via Supabase pgvector fornecido abaixo.\n"
+        "2. Caso a informação solicitada pelo usuário não conste explicitamente nos fragmentos abaixo, aplique **abstinência estrita** "
+        "(informe de maneira acolhedora e transparente que não há evidências suficientes nos documentos indexados e NÃO invente ou extrapole dados).\n"
+        "3. Cite obrigatoriamente as fontes utilizadas no formato `[Fonte: nome_do_arquivo | Trecho #N]` ao longo da resposta.\n"
+        "4. Ao final, coloque-se à disposição de forma cordial caso o usuário queira aprofundar algum ponto.\n\n"
+        f"CONTEXTO DOCUMENTAL RECUPERADO (SUPABASE PGVECTOR 768D):\n{context_text}"
     )
 
     gemini_error_note: Optional[str] = None
@@ -417,18 +417,17 @@ def synthesize_rag_answer(
         except Exception as exc:
             gemini_error_note = sanitize_error_message(str(exc))
 
-    # 3. Grounded structured RAG synthesis from top retrieved chunks (offline / fallback protection)
+    # 3. Grounded humanized RAG synthesis from top retrieved chunks (offline / fallback protection)
     top = citations[0]
     secondary = citations[1:3]
 
     lines: list[str] = [
-        "### Síntese Documental",
-        f"Com base na recuperação semântica sobre a base de conhecimento, o documento **`{top.filename}`** "
-        f"apresenta a evidência principal com índice de relevância de **{int(top.similarity * 100)}%** "
-        f"`[Fonte: {top.filename} | Trecho #{top.chunk_index}]`.",
+        f"Olá! Analisando os documentos da nossa base com o Supabase pgvector (`{settings.GEMINI_EMBEDDING_DIMENSION}d`), "
+        f"encontrei a resposta para a sua dúvida principalmente em **`{top.filename}`** "
+        f"(relevância semântica de **{int(top.similarity * 100)}%**) `[Fonte: {top.filename} | Trecho #{top.chunk_index}]`.",
         "",
-        "### Evidências Estruturadas",
-        f"- **Referência Primária (`{top.filename}`, Trecho #{top.chunk_index}):**\n  {top.excerpt.strip()} "
+        "De forma bem direta e prática, veja o que consta nos nossos documentos:",
+        f"- **Ponto Principal (`{top.filename}`, Trecho #{top.chunk_index}):**\n  {top.excerpt.strip()} "
         f"`[Fonte: {top.filename} | Trecho #{top.chunk_index}]`",
     ]
 
@@ -443,11 +442,9 @@ def synthesize_rag_answer(
     lines.extend(
         [
             "",
-            "### Fontes Verificadas no Pipeline",
-            f"Foram inspecionados **{len(citations)} fragmentos vetoriais ({settings.GEMINI_EMBEDDING_DIMENSION}d)** "
-            f"distribuídos em **{len(unique_docs)} documento(s)**: "
-            + ", ".join(f"`{d}`" for d in unique_docs)
-            + ".",
+            f"Consultei ao todo **{len(citations)} fragmentos vetoriais ({settings.GEMINI_EMBEDDING_DIMENSION}d)** "
+            f"em **{len(unique_docs)} documento(s)** ({', '.join(f'`{d}`' for d in unique_docs)}). "
+            "Posso te ajudar a detalhar alguma etapa ou trecho específico?",
         ]
     )
 
