@@ -289,6 +289,7 @@ def synthesize_rag_answer(
     # Strict Abstinence Guardrail: Do not answer or call LLM when no chunks meet similarity threshold
     if not citations:
         return (
+            "### Abstinência por Insuficiência de Evidências Documentais\n\n"
             "Olá! Consultei atentamente todos os documentos da nossa base de conhecimento no Supabase pgvector (`768d`), "
             "mas **não encontrei evidências suficientes** nos arquivos indexados "
             f"(limiar mínimo de segurança: **{int(settings.RAG_MIN_SIMILARITY_THRESHOLD * 100)}%**) "
