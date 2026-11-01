@@ -172,12 +172,12 @@ export default function AIKnowledgeApp() {
               className="w-full flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2.5 rounded-2xl text-sm font-medium shadow-lg shadow-purple-600/25 transition-all"
             >
               <Plus size={18} />
-              <span>+ Nova Conversa</span>
+              <span>Nova Conversa</span>
             </button>
           ) : (
             <button 
               onClick={handleStartNewChat}
-              title="+ Nova Conversa"
+              title="Nova Conversa"
               className="mx-auto flex items-center justify-center bg-purple-600 hover:bg-purple-500 text-white w-10 h-10 rounded-2xl shadow-md transition-all"
             >
               <Plus size={20} />
@@ -328,7 +328,7 @@ export default function AIKnowledgeApp() {
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-2xs'
               }`}
             >
-              <Plus size={14} /> + Enviar Documento
+              <Plus size={14} /> Enviar Documento
             </button>
           </div>
         </header>
