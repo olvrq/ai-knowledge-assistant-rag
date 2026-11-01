@@ -365,6 +365,26 @@ class KnowledgeRepository:
                 pass
 
         with self._get_conn() as conn:
+            first_meta = chunks_data[0].get("metadata", {}) if chunks_data else {}
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO documents (
+                    id, user_id, filename, file_type, file_size,
+                    chunk_count, status, error_message, raw_text,
+                    metadata, created_at, updated_at
+                )
+                VALUES (?, ?, ?, ?, 0, ?, 'indexed', NULL, '', '{}', ?, ?)
+                """,
+                (
+                    document_id,
+                    user_id,
+                    str(first_meta.get("filename", "Documento")),
+                    str(first_meta.get("file_type", "TXT")),
+                    len(chunks_data),
+                    now,
+                    now,
+                ),
+            )
             conn.execute(
                 "DELETE FROM document_chunks WHERE document_id = ?", (document_id,)
             )
@@ -575,7 +595,13 @@ class KnowledgeRepository:
             r = conn.execute(
                 "SELECT raw_text FROM documents WHERE id = ?", (document_id,)
             ).fetchone()
-            return r["raw_text"] if r else None
+            if r and r["raw_text"]:
+                return r["raw_text"]
+
+        chunks = self.get_document_chunks(document_id)
+        if chunks:
+            return "\n\n".join(c.content for c in chunks)
+        return None
 
     def get_document_chunks(self, document_id: str) -> list[DocumentChunkResponse]:
         if self.is_supabase_active:
@@ -629,12 +655,14 @@ class KnowledgeRepository:
     def delete_document(
         self, document_id: str, user_id: Optional[str] = None
     ) -> bool:
+        supa_deleted = False
         if self.is_supabase_active:
             try:
                 q = self._supabase_client.table("documents").delete().eq("id", document_id)
                 if user_id:
                     q = q.or_(f"user_id.eq.{user_id},user_id.is.null")
-                q.execute()
+                res = q.execute()
+                supa_deleted = bool(res.data)
             except Exception:
                 pass
 
@@ -647,7 +675,7 @@ class KnowledgeRepository:
             else:
                 cur = conn.execute("DELETE FROM documents WHERE id = ?", (document_id,))
             conn.commit()
-            return cur.rowcount > 0
+            return supa_deleted or (cur.rowcount > 0)
 
     # -------------------------------------------------------------------------
     # VECTOR SIMILARITY SEARCH (PGVECTOR 768D + LOCAL COSINE ENGINE)
@@ -929,12 +957,14 @@ class KnowledgeRepository:
     def delete_conversation(
         self, conversation_id: str, user_id: Optional[str] = None
     ) -> bool:
+        supa_deleted = False
         if self.is_supabase_active:
             try:
                 q = self._supabase_client.table("conversations").delete().eq("id", conversation_id)
                 if user_id:
                     q = q.or_(f"user_id.eq.{user_id},user_id.is.null")
-                q.execute()
+                res = q.execute()
+                supa_deleted = bool(res.data)
             except Exception:
                 pass
 
@@ -949,7 +979,7 @@ class KnowledgeRepository:
                     "DELETE FROM conversations WHERE id = ?", (conversation_id,)
                 )
             conn.commit()
-            return cur.rowcount > 0
+            return supa_deleted or (cur.rowcount > 0)
 
     def add_message(
         self,
@@ -982,6 +1012,13 @@ class KnowledgeRepository:
                 pass
 
         with self._get_conn() as conn:
+            conn.execute(
+                """
+                INSERT OR IGNORE INTO conversations (id, user_id, title, created_at, updated_at)
+                VALUES (?, NULL, ?, ?, ?)
+                """,
+                (conversation_id, content[:56] or "Consulta RAG", now, now),
+            )
             conn.execute(
                 """
                 INSERT INTO messages (id, conversation_id, role, content, citations, created_at)

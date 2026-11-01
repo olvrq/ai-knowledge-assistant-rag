@@ -171,7 +171,7 @@ def _embed_with_gemini(texts: list[str], task_type: str) -> list[list[float]]:
             try:
                 client = genai.Client(
                     api_key=settings.GEMINI_API_KEY,
-                    http_options={"timeout": 10000},
+                    http_options={"timeout": 8000},
                 )
                 sdk_model = model_name.replace("models/", "")
                 response = client.models.embed_content(
@@ -190,8 +190,8 @@ def _embed_with_gemini(texts: list[str], task_type: str) -> list[list[float]]:
             except Exception:
                 pass
 
-        # 2. Fallback to LangChain GoogleGenerativeAIEmbeddings
-        if LANGCHAIN_GEMINI_AVAILABLE:
+        # 2. Fallback to LangChain GoogleGenerativeAIEmbeddings only if SDK not available
+        elif LANGCHAIN_GEMINI_AVAILABLE:
             try:
                 embedder = GoogleGenerativeAIEmbeddings(
                     model=model_name,
@@ -335,18 +335,15 @@ def synthesize_rag_answer(
         match = re.search(r"use models/([a-zA-Z0-9\.\-_]+)", err_text)
         return match.group(1) if match else None
 
-    # 1. Try google-genai SDK with automatic model resolution and 25s timeout
+    # 1. Try google-genai SDK with fast 8s timeout per candidate model
     if settings.is_gemini_configured and GOOGLE_GENAI_SDK_AVAILABLE:
         client = genai.Client(
             api_key=settings.GEMINI_API_KEY,
-            http_options={"timeout": 25000},
+            http_options={"timeout": 8000},
         )
-        models_to_try = [primary_model, "gemini-2.5-flash-lite", "gemini-flash-latest"]
+        models_to_try = [primary_model, "gemini-flash-latest"]
         seen_models: set[str] = set()
-        idx = 0
-        while idx < len(models_to_try) and len(seen_models) < 3:
-            active_model = models_to_try[idx]
-            idx += 1
+        for active_model in models_to_try:
             if active_model in seen_models:
                 continue
             seen_models.add(active_model)
@@ -379,9 +376,6 @@ def synthesize_rag_answer(
             except Exception as exc:
                 err_str = str(exc)
                 gemini_error_note = sanitize_error_message(err_str)
-                rec = _extract_recommended_model(err_str)
-                if rec and rec not in seen_models:
-                    models_to_try.insert(idx, rec)
 
     # 2. Fallback to LangChain ChatGoogleGenerativeAI wrapper if google-genai SDK unavailable
     if settings.is_gemini_configured and LANGCHAIN_GEMINI_AVAILABLE and not GOOGLE_GENAI_SDK_AVAILABLE:
