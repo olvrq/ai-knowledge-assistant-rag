@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Knowledge Assistant — Inteligência Documental &amp; RAG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* =========================================================================
+       DIREÇÃO VISUAL OFICIAL — AI KNOWLEDGE ASSISTANT (SPECIFY DESIGN LANGUAGE)
+       Grade estrita de 8px · Sem glassmorphism · Sem fundos em gradiente
+       ========================================================================= */
+    :root {
+      --color-iris: #624de3;
+      --color-soft-iris: #8d4af7;
+      --color-studio-slate: #1a1d1e;
+      --color-obsidian: #151718;
+      --color-white: #ffffff;
+      --color-cloud: #f6f7f9;
+      --color-mist: #ebedef;
+      --color-graphite: #8d8e8f;
+      --color-iron: #5f6162;
+      --color-noir: #000000;
+      --color-lilac-wash: #f1eefe;
+
+      --space-1: 8px;
+      --space-2: 16px;
+      --space-3: 24px;
+      --space-4: 32px;
+      --space-5: 40px;
+      --space-6: 48px;
+      --space-8: 64px;
+
+      --radius-card: 16px;
+      --radius-button: 40px;
+      --radius-input: 6px;
+
+      --shadow-card: 0 2px 8px rgba(21, 23, 24, 0.04);
+      --shadow-card-hover: 0 4px 16px rgba(21, 23, 24, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--color-white);
+      color: var(--color-studio-slate);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Layout Principal com Barra Lateral Discreta + Área Principal Branca */
+    .app-shell {
+      display: grid;
+      grid-template-columns: 272px 1fr;
+      min-height: 100vh;
+      background-color: var(--color-white);
+    }
+
+    /* Sidebar Discreta */
+    .sidebar {
+      background-color: var(--color-cloud);
+      border-right: 1px solid var(--color-mist);
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-mist);
+      margin-bottom: var(--space-3);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background-color: var(--color-iris);
+      color: var(--color-white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-studio-slate);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--color-graphite);
+      font-weight: 500;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-graphite);
+      margin-bottom: var(--space-1);
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      margin-bottom: var(--space-3);
+    }
+
+    /* Botões (Border-radius: 40px) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      border-radius: var(--radius-button);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+      padding: 10px 24px;
+      min-height: 40px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background-color: var(--color-studio-slate);
+      color: var(--color-white);
+      border: 1px solid var(--color-studio-slate);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--color-noir);
+      border-color: var(--color-iris);
+    }
+
+    .btn-secondary {
+      background-color: var(--color-white);
+      color: var(--color-studio-slate);
+      border: 1px solid var(--color-mist);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: var(--color-lilac-wash);
+      border-color: var(--color-iris);
+      color: var(--color-iris);
+    }
+
+    .btn-nav {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 10px 16px;
+    }
+
+    .btn-sm {
+      padding: 6px 16px;
+      min-height: 32px;
+      font-size: 13px;
+    }
+
+    /* Campos de Entrada (Border-radius: 6px, foco em violeta) */
+    .input-field, .select-field, .textarea-field {
+      width: 100%;
+      background-color: var(--color-white);
+      color: var(--color-studio-slate);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-input);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      outline: none;
+    }
+
+    .input-field:focus, .select-field:focus, .textarea-field:focus {
+      border-color: var(--color-iris);
+      box-shadow: 0 0 0 3px var(--color-lilac-wash);
+    }
+
+    .textarea-field {
+      resize: vertical;
+      min-height: 88px;
+      line-height: 1.5;
+    }
+
+    /* Cards (Fundo branco, border-radius: 16px, borda sutil, sombra discreta) */
+    .ka-card {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-card);
+      padding: var(--space-3);
+      box-shadow: var(--shadow-card);
+    }
+
+    .ka-card-cloud {
+      background-color: var(--color-cloud);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-card);
+      padding: var(--space-3);
+    }
+
+    /* Badges */
+    .ka-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-button);
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .ka-badge-violet {
+      background-color: var(--color-lilac-wash);
+      color: var(--color-iris);
+    }
+
+    .ka-badge-neutral {
+      background-color: var(--color-cloud);
+      color: var(--color-iron);
+      border: 1px solid var(--color-mist);
+    }
+
+    .ka-badge-dark {
+      background-color: var(--color-studio-slate);
+      color: var(--color-white);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-iris);
+      display: inline-block;
+    }
+
+    /* Conteúdo Principal e Topbar */
+    .main-area {
+      padding: var(--space-4) var(--space-5) var(--space-8) var(--space-5);
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--space-2);
+      margin-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-mist);
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      flex-wrap: wrap;
+    }
+
+    /* Hero Escuro (Página Inicial) */
+    .ka-hero-section {
+      background-color: var(--color-obsidian);
+      border: 1px solid var(--color-studio-slate);
+      border-radius: var(--radius-card);
+      padding: var(--space-8) var(--space-6);
+      margin-bottom: var(--space-4);
+      color: var(--color-white);
+    }
+
+    .ka-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      background-color: var(--color-studio-slate);
+      border: 1px solid var(--color-iron);
+      color: var(--color-white);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 6px 16px;
+      border-radius: var(--radius-button);
+      margin-bottom: var(--space-3);
+    }
+
+    .ka-hero-headline {
+      font-size: 56px;
+      line-height: 1.08;
+      font-weight: 700;
+      letter-spacing: -0.035em;
+      color: var(--color-white);
+      margin-bottom: var(--space-3);
+      max-width: 840px;
+    }
+
+    .ka-hero-headline-gradient {
+      background: linear-gradient(135deg, var(--color-iris) 0%, var(--color-soft-iris) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ka-hero-description {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--color-mist);
+      font-weight: 400;
+      max-width: 680px;
+      margin-bottom: var(--space-4);
+    }
+
+    .ka-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background-color: var(--color-white);
+      color: var(--color-studio-slate);
+      border: 1px solid var(--color-white);
+    }
+
+    .btn-hero-primary:hover {
+      background-color: var(--color-lilac-wash);
+      color: var(--color-iris);
+      border-color: var(--color-iris);
+    }
+
+    .btn-hero-secondary {
+      background-color: var(--color-studio-slate);
+      color: var(--color-white);
+      border: 1px solid var(--color-iron);
+    }
+
+    .btn-hero-secondary:hover {
+      border-color: var(--color-soft-iris);
+      color: var(--color-white);
+    }
+
+    .ka-pipeline-wrapper {
+      margin-top: var(--space-6);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-studio-slate);
+    }
+
+    .ka-pipeline-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-graphite);
+      margin-bottom: var(--space-2);
+    }
+
+    .ka-pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-2);
+    }
+
+    .ka-pipeline-node {
+      background-color: var(--color-studio-slate);
+      border: 1px solid var(--color-iris);
+      border-radius: var(--radius-card);
+      padding: var(--space-2);
+    }
+
+    .ka-pipeline-step {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-soft-iris);
+      background-color: var(--color-obsidian);
+      padding: 4px 10px;
+      border-radius: var(--radius-button);
+      margin-bottom: var(--space-1);
+    }
+
+    .ka-pipeline-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-white);
+      margin-bottom: 4px;
+    }
+
+    .ka-pipeline-meta {
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--color-graphite);
+    }
+
+    /* Cabeçalhos de Página */
+    .page-header {
+      padding-bottom: var(--space-3);
+      margin-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-mist);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .page-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-iris);
+      margin-bottom: 4px;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--color-studio-slate);
+      line-height: 1.15;
+    }
+
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--color-iron);
+      margin-top: 4px;
+    }
+
+    /* Grids utilitários (8px multiples) */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-2);
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+    }
+
+    .grid-dashboard {
+      display: grid;
+      grid-template-columns: 1.7fr 1.1fr;
+      gap: var(--space-3);
+      margin-top: var(--space-3);
+    }
+
+    .grid-assistant {
+      display: grid;
+      grid-template-columns: 260px 1fr 340px;
+      gap: var(--space-3);
+      align-items: start;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-iron);
+      margin-bottom: var(--space-1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--color-studio-slate);
+      line-height: 1.15;
+      margin-bottom: 4px;
+    }
+
+    .metric-sub {
+      font-size: 12px;
+      color: var(--color-graphite);
+      font-weight: 500;
+    }
+
+    /* Upload Zone */
+    .upload-dropzone {
+      background-color: var(--color-cloud);
+      border: 1px dashed var(--color-graphite);
+      border-radius: var(--radius-card);
+      padding: var(--space-4);
+      text-align: center;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+      margin-bottom: var(--space-3);
+    }
+
+    .upload-dropzone:hover {
+      border-color: var(--color-iris);
+      background-color: var(--color-lilac-wash);
+    }
+
+    /* Chat Messages & Citations */
+    .chat-msg-user {
+      background-color: var(--color-cloud);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-card);
+      padding: var(--space-2) var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+
+    .chat-msg-assistant {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-mist);
+      border-left: 4px solid var(--color-iris);
+      border-radius: var(--radius-card);
+      padding: var(--space-3);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-3);
+    }
+
+    .chat-role-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-content {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--color-studio-slate);
+    }
+
+    .chat-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 12px 0 6px 0;
+      color: var(--color-studio-slate);
+    }
+
+    .chat-content ul {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+
+    .chat-content code {
+      background-color: var(--color-lilac-wash);
+      color: var(--color-iris);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .citation-card {
+      background-color: var(--color-cloud);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-card);
+      padding: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .citation-excerpt {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--color-iron);
+      background-color: var(--color-white);
+      border: 1px solid var(--color-mist);
+      border-radius: var(--radius-input);
+      padding: 12px;
+      margin-top: var(--space-1);
+      white-space: pre-wrap;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    .toast-banner {
+      padding: 12px 16px;
+      border-radius: var(--radius-input);
+      background-color: var(--color-lilac-wash);
+      color: var(--color-iris);
+      border: 1px solid var(--color-iris);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: var(--space-2);
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+      .ka-pipeline-grid, .grid-4, .grid-3, .grid-dashboard, .grid-assistant {
+        grid-template-columns: 1fr;
+      }
+      .ka-hero-headline {
+        font-size: 40px;
+      }
+      .main-area {
+        padding: var(--space-3);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- BARRA LATERAL DISCRETA -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-header">
+          <div class="brand-mark">◈</div>
+          <div>
+            <div class="brand-title">Knowledge Assistant</div>
+            <div class="brand-subtitle">Enterprise RAG Platform</div>
+          </div>
+        </div>
+
+        <div class="nav-section-label">Navegação</div>
+        <div class="nav-list">
+          <button class="btn btn-primary btn-nav" id="side-nav-inicio" onclick="switchView('inicio')">Página Inicial</button>
+          <button class="btn btn-secondary btn-nav" id="side-nav-dashboard" onclick="switchView('dashboard')">Dashboard</button>
+          <button class="btn btn-secondary btn-nav" id="side-nav-biblioteca" onclick="switchView('biblioteca')">Biblioteca Documental</button>
+          <button class="btn btn-secondary btn-nav" id="side-nav-assistente" onclick="switchView('assistente')">Assistente RAG</button>
+        </div>
+
+        <div class="ka-card" style="padding: 16px; margin-bottom: 16px;">
+          <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-iris); margin-bottom: 8px;">
+            Pipeline Ativo (Gemini)
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+            <span style="color: var(--color-iron);">Documentos</span>
+            <span style="font-weight: 600;" id="side-stat-docs">0 indexados</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+            <span style="color: var(--color-iron);">Fragmentos</span>
+            <span style="font-weight: 600;" id="side-stat-chunks">0 vetores</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--color-iron);">Motor Vetorial</span>
+            <span style="font-weight: 600; color: var(--color-iris);">pgvector 768d</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel de Sessão & Autenticação JWT -->
+      <div class="ka-card" style="padding: 16px;">
+        <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-graphite); margin-bottom: 6px;">
+          Sessão &amp; Segurança JWT
+        </div>
+        <div id="auth-logged-in">
+          <div style="font-size: 14px; font-weight: 600;" id="auth-user-name">Administrador Knowledge AI</div>
+          <div style="font-size: 12px; color: var(--color-iron); margin-bottom: 8px;" id="auth-user-email">admin@knowledge.ai</div>
+          <span class="ka-badge ka-badge-violet" style="margin-bottom: 10px;">Acesso Verificado</span>
+          <button class="btn btn-secondary btn-sm" style="width: 100%;" onclick="toggleAuthForm()">Alternar Conta</button>
+        </div>
+        <div id="auth-form-box" style="display: none; margin-top: 8px;">
+          <input type="email" id="login-email" class="input-field" placeholder="E-mail" value="admin@knowledge.ai" style="margin-bottom: 8px;" />
+          <input type="password" id="login-password" class="input-field" placeholder="Senha" value="admin123" style="margin-bottom: 8px;" />
+          <button class="btn btn-primary btn-sm" style="width: 100%;" onclick="performLogin()">Autenticar JWT</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <main class="main-area">
+      <!-- Barra de Navegação Superior Discreta -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="ka-badge ka-badge-violet">
+            <span class="status-dot"></span>RAG Engine v2.0
+          </span>
+          <span style="font-size: 13px; color: var(--color-graphite); font-weight: 500;">
+            FastAPI · Supabase · pgvector (768d) · LangChain · Google Gemini
+          </span>
+        </div>
+        <div class="topbar-nav">
+          <button class="btn btn-primary btn-sm" id="top-nav-inicio" onclick="switchView('inicio')">Página Inicial</button>
+          <button class="btn btn-secondary btn-sm" id="top-nav-dashboard" onclick="switchView('dashboard')">Dashboard</button>
+          <button class="btn btn-secondary btn-sm" id="top-nav-biblioteca" onclick="switchView('biblioteca')">Biblioteca Documental</button>
+          <button class="btn btn-secondary btn-sm" id="top-nav-assistente" onclick="switchView('assistente')">Assistente</button>
+        </div>
+      </header>
+
+      <div id="toast-banner" class="toast-banner"></div>
+
+      <!-- ===================================================================
+           1. PÁGINA INICIAL (HERO ESCURO + PIPELINE RAG)
+           =================================================================== -->
+      <section id="view-inicio" class="view-section active">
+        <div class="ka-hero-section">
+          <div class="ka-hero-badge">
+            <span class="status-dot"></span>
+            KNOWLEDGE ASSISTANT · INTELIGÊNCIA DOCUMENTAL &amp; RAG
+          </div>
+          <h1 class="ka-hero-headline">
+            Conhecimento documental transformado em
+            <span class="ka-hero-headline-gradient">respostas precisas e auditáveis.</span>
+          </h1>
+          <p class="ka-hero-description">
+            Arquitetura de Retrieval-Augmented Generation (RAG) construída com FastAPI, Supabase pgvector,
+            LangChain e Google Gemini. Ingestão estruturada de documentos técnicos, indexação vetorial em 768
+            dimensões e síntese analítica com rastreabilidade exata de cada trecho citado.
+          </p>
+          <div class="ka-hero-actions">
+            <button class="btn btn-hero-primary" onclick="switchView('assistente')">Acessar o Assistente →</button>
+            <button class="btn btn-hero-secondary" onclick="switchView('biblioteca')">Biblioteca Documental</button>
+            <button class="btn btn-hero-secondary" onclick="switchView('dashboard')">Explorar Dashboard</button>
+          </div>
+
+          <div class="ka-pipeline-wrapper">
+            <div class="ka-pipeline-label">Arquitetura Operacional do Pipeline RAG em Tempo Real</div>
+            <div class="ka-pipeline-grid">
+              <div class="ka-pipeline-node">
+                <div class="ka-pipeline-step">ETAPA 01</div>
+                <div class="ka-pipeline-title">Ingestão Documental</div>
+                <div class="ka-pipeline-meta" id="hero-step-1">Extração higienizada de PDF, DOCX, Markdown e TXT.</div>
+              </div>
+              <div class="ka-pipeline-node">
+                <div class="ka-pipeline-step">ETAPA 02</div>
+                <div class="ka-pipeline-title">Chunking Semântico</div>
+                <div class="ka-pipeline-meta">LangChain RecursiveSplitter (900 chars / overlap 150).</div>
+              </div>
+              <div class="ka-pipeline-node">
+                <div class="ka-pipeline-step">ETAPA 03</div>
+                <div class="ka-pipeline-title">Vetorização Gemini</div>
+                <div class="ka-pipeline-meta">Embeddings MRL em 768 dimensões via models/gemini-embedding-001.</div>
+              </div>
+              <div class="ka-pipeline-node">
+                <div class="ka-pipeline-step">ETAPA 04</div>
+                <div class="ka-pipeline-title">Busca Supabase pgvector</div>
+                <div class="ka-pipeline-meta" id="hero-step-4">Similaridade de cosseno HNSW sobre fragmentos indexados.</div>
+              </div>
+              <div class="ka-pipeline-node">
+                <div class="ka-pipeline-step">ETAPA 05</div>
+                <div class="ka-pipeline-title">Síntese com Citações</div>
+                <div class="ka-pipeline-meta">Respostas estruturadas via Google Gemini com abstinência e citações.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="ka-card">
+            <div style="margin-bottom: 12px;"><span class="ka-badge ka-badge-violet">Indexação Vetorial</span></div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">Supabase &amp; pgvector</h3>
+            <p style="font-size: 14px; color: var(--color-iron);">
+              Armazenamento relacional e vetorial unificado em 768 dimensões com busca semântica HNSW por similaridade de cosseno e políticas de Row Level Security (RLS).
+            </p>
+          </div>
+          <div class="ka-card">
+            <div style="margin-bottom: 12px;"><span class="ka-badge ka-badge-violet">Orquestração Cognitiva</span></div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">LangChain &amp; Google Gemini</h3>
+            <p style="font-size: 14px; color: var(--color-iron);">
+              Segmentação contextual inteligente preservando estrutura documental e geração controlada com aterramento estrito (strict grounding) e abstinência automática.
+            </p>
+          </div>
+          <div class="ka-card">
+            <div style="margin-bottom: 12px;"><span class="ka-badge ka-badge-violet">Rastreabilidade Total</span></div>
+            <h3 style="font-size: 18px; margin-bottom: 8px;">Citações &amp; Auditoria</h3>
+            <p style="font-size: 14px; color: var(--color-iron);">
+              Cada resposta do assistente apresenta as referências exatas de documento, número do fragmento e grau de similaridade semântica no painel lateral.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           2. DASHBOARD OPERACIONAL
+           =================================================================== -->
+      <section id="view-dashboard" class="view-section">
+        <div class="page-header">
+          <div>
+            <div class="page-kicker">VISÃO OPERACIONAL</div>
+            <h2 class="page-title">Dashboard de Inteligência Documental</h2>
+            <p class="page-subtitle">Monitoramento em tempo real da base documental, fragmentos vetoriais e integridade do pipeline RAG.</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" onclick="switchView('biblioteca')">Enviar Documento</button>
+            <button class="btn btn-primary btn-sm" onclick="switchView('assistente')">Abrir Assistente →</button>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="ka-card">
+            <div class="metric-label">
+              <span>Documentos na Base</span>
+              <span class="ka-badge ka-badge-violet" id="dash-indexed-badge">0 ativos</span>
+            </div>
+            <div class="metric-value" id="dash-total-docs">0</div>
+            <div class="metric-sub" id="dash-total-bytes">Volume: 0 KB</div>
+          </div>
+          <div class="ka-card">
+            <div class="metric-label">
+              <span>Fragmentos Indexados</span>
+              <span class="ka-badge ka-badge-neutral">768 dims</span>
+            </div>
+            <div class="metric-value" id="dash-total-chunks">0</div>
+            <div class="metric-sub">Janela: 900 caracteres</div>
+          </div>
+          <div class="ka-card">
+            <div class="metric-label">
+              <span>Histórico de Conversas</span>
+              <span class="ka-badge ka-badge-neutral">RAG Chat</span>
+            </div>
+            <div class="metric-value" id="dash-total-convs">0</div>
+            <div class="metric-sub" id="dash-total-msgs">0 interações registradas</div>
+          </div>
+          <div class="ka-card">
+            <div class="metric-label">
+              <span>Status de Indexação</span>
+              <span class="ka-badge ka-badge-violet">Online</span>
+            </div>
+            <div class="metric-value" style="font-size: 24px; padding-top: 6px;" id="dash-health-label">100% Operacional</div>
+            <div class="metric-sub" id="dash-storage-mode">Supabase + pgvector (768d)</div>
+          </div>
+        </div>
+
+        <div class="grid-dashboard">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <h3 style="font-size: 18px;">Documentos Recentes</h3>
+              <span style="font-size: 13px; color: var(--color-graphite);">Últimas ingestões no repositório</span>
+            </div>
+            <div id="dash-recent-docs-list"></div>
+          </div>
+          <div>
+            <h3 style="font-size: 18px; margin-bottom: 16px;">Status de Processamento &amp; RAG</h3>
+            <div class="ka-card">
+              <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-mist);">
+                <div style="font-size: 12px; font-weight: 600; color: var(--color-graphite); text-transform: uppercase; margin-bottom: 6px;">
+                  Camada de Persistência Vetorial
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 14px; font-weight: 600;" id="pipe-storage-text">Supabase + pgvector (768d)</span>
+                  <span class="ka-badge ka-badge-violet" id="pipe-supa-badge">Conectado</span>
+                </div>
+              </div>
+              <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-mist);">
+                <div style="font-size: 12px; font-weight: 600; color: var(--color-graphite); text-transform: uppercase; margin-bottom: 6px;">
+                  Modelos Google Gemini &amp; Embeddings
+                </div>
+                <div style="font-size: 13px; color: var(--color-iron); margin-bottom: 4px;">
+                  <strong>LLM:</strong> <span id="pipe-llm-model">gemini-2.5-flash</span>
+                </div>
+                <div style="font-size: 13px; color: var(--color-iron);">
+                  <strong>Embedding:</strong> <span id="pipe-emb-model">models/gemini-embedding-001 (768d)</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; font-weight: 600; color: var(--color-graphite); text-transform: uppercase; margin-bottom: 8px;">
+                  Distribuição por Formato
+                </div>
+                <div id="dash-format-badges"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           3. BIBLIOTECA DOCUMENTAL
+           =================================================================== -->
+      <section id="view-biblioteca" class="view-section">
+        <div class="page-header">
+          <div>
+            <div class="page-kicker">GESTÃO DE CONHECIMENTO</div>
+            <h2 class="page-title">Biblioteca Documental</h2>
+            <p class="page-subtitle">Envie documentos corporativos para extração, fragmentação semântica via LangChain e indexação vetorial no pgvector.</p>
+          </div>
+        </div>
+
+        <div class="upload-dropzone">
+          <div style="margin-bottom: 8px;">
+            <span class="ka-badge ka-badge-violet">Ingestão Direta no Pipeline RAG</span>
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">Área de Upload Documental</h3>
+          <p style="font-size: 14px; color: var(--color-iron); margin-bottom: 16px;">
+            Formatos suportados: <strong>PDF, DOCX, Markdown (.md) e Texto (.txt)</strong> (até 4 MB por envio Serverless).
+          </p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
+            <input type="file" id="doc-file-input" accept=".pdf,.docx,.md,.txt" class="input-field" style="max-width: 380px;" />
+            <button class="btn btn-primary" id="btn-upload-doc" onclick="uploadDocument()">Processar e Indexar</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;">
+          <input type="text" id="lib-search-input" class="input-field" placeholder="Filtrar documentos por nome..." style="flex: 1; min-width: 240px;" oninput="renderLibraryList()" />
+          <select id="lib-format-filter" class="select-field" style="width: 200px;" onchange="renderLibraryList()">
+            <option value="ALL">Todos os formatos</option>
+            <option value="PDF">PDF</option>
+            <option value="MD">MD</option>
+            <option value="TXT">TXT</option>
+            <option value="DOCX">DOCX</option>
+          </select>
+        </div>
+
+        <div id="lib-documents-container"></div>
+      </section>
+
+      <!-- ===================================================================
+           4. ASSISTENTE RAG (CHAT, CITAÇÕES, PAINEL DE REFERÊNCIAS, HISTÓRICO)
+           =================================================================== -->
+      <section id="view-assistente" class="view-section">
+        <div class="page-header">
+          <div>
+            <div class="page-kicker">CONSULTA SEMÂNTICA &amp; SÍNTESE</div>
+            <h2 class="page-title">Assistente de Conhecimento Documental</h2>
+            <p class="page-subtitle">Faça perguntas técnicas sobre sua biblioteca documental. Todas as respostas são fundamentadas e acompanhadas das citações originais.</p>
+          </div>
+        </div>
+
+        <div class="grid-assistant">
+          <!-- Coluna 1: Histórico de Conversas -->
+          <div>
+            <div class="nav-section-label" style="margin-bottom: 12px;">Histórico de Conversas</div>
+            <button class="btn btn-primary btn-sm" style="width: 100%; margin-bottom: 12px;" onclick="createNewConversation()">+ Nova Conversa</button>
+            <div id="conv-history-list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;"></div>
+            <button class="btn btn-secondary btn-sm" style="width: 100%;" id="btn-del-conv" onclick="deleteActiveConversation()">Excluir Conversa Atual</button>
+          </div>
+
+          <!-- Coluna 2: Interface de Chat Limpa -->
+          <div>
+            <div class="nav-section-label" style="margin-bottom: 10px;">Consultas Rápidas Sugeridas</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <button class="btn btn-secondary btn-sm" onclick="askSuggested('Como funciona a arquitetura do pipeline RAG, o chunking no LangChain e a vetorização em 768 dimensões no pgvector?')">Arquitetura do Pipeline RAG</button>
+              <button class="btn btn-secondary btn-sm" onclick="askSuggested('Quais são as regras de segurança, autenticação JWT e abstinência exigidas pela política?')">Segurança e Abstinência</button>
+              <button class="btn btn-secondary btn-sm" onclick="askSuggested('Como opera a função RPC match_document_chunks no Supabase pgvector e como reindexar documentos?')">Operação do Supabase pgvector</button>
+            </div>
+
+            <div class="ka-card" style="margin-bottom: 24px;">
+              <textarea id="chat-question-input" class="textarea-field" placeholder="Digite sua pergunta técnica sobre os documentos indexados..."></textarea>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; flex-wrap: wrap; gap: 12px;">
+                <span style="font-size: 12px; color: var(--color-graphite);">Respostas fundamentadas exclusivamente nos documentos indexados com citação obrigatória de fonte.</span>
+                <button class="btn btn-primary" id="btn-send-question" onclick="submitQuestion()">Consultar Base RAG →</button>
+              </div>
+            </div>
+
+            <div id="chat-messages-container"></div>
+          </div>
+
+          <!-- Coluna 3: Painel de Referências Documentais -->
+          <div>
+            <div class="nav-section-label" style="margin-bottom: 12px;">Painel de Referências Documentais</div>
+            <div id="references-panel-container">
+              <div class="ka-card-cloud">
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Aguardando Consulta</div>
+                <p style="font-size: 13px; color: var(--color-iron);">
+                  Os fragmentos recuperados via busca semântica no pgvector serão exibidos aqui com seu score de similaridade e trecho original.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let state = {
+      activeView: 'inicio',
+      token: null,
+      user: null,
+      stats: null,
+      documents: [],
+      conversations: [],
+      activeConversationId: null,
+      messages: [],
+      activeCitations: [],
+      inspectedChunksByDoc: {}
+    };
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formatBytes(bytes) {
+      const b = Number(bytes || 0);
+      if (b < 1024) return b + ' B';
+      if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+      return (b / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      } catch (_) {
+        return String(iso).slice(0, 16);
+      }
+    }
+
+    function formatMarkdownSimple(md) {
+      let html = escapeHtml(md || '');
+      html = html.replace(/^### (.*)$/gm, '<h3>$1</h3>');
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      html = html.replace(/^- (.*)$/gm, '<li>$1</li>');
+      html = html.replace(/\n\n/g, '<br/><br/>');
+      return html;
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast-banner');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 4500);
+    }
+
+    async function apiFetch(path, options = {}) {
+      const headers = Object.assign({}, options.headers || {});
+      if (state.token) {
+        headers['Authorization'] = 'Bearer ' + state.token;
+      }
+      if (options.json) {
+        headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(options.json);
+      }
+      const res = await fetch(path, Object.assign({}, options, { headers }));
+      if (!res.ok) {
+        let detail = 'Erro ' + res.status;
+        try {
+          const errJson = await res.json();
+          detail = errJson.detail || detail;
+        } catch (_) {}
+        throw new Error(detail);
+      }
+      return res.json();
+    }
+
+    function switchView(viewName) {
+      state.activeView = viewName;
+      ['inicio', 'dashboard', 'biblioteca', 'assistente'].forEach(v => {
+        const sec = document.getElementById('view-' + v);
+        if (sec) sec.classList.toggle('active', v === viewName);
+
+        const sBtn = document.getElementById('side-nav-' + v);
+        if (sBtn) {
+          sBtn.className = 'btn ' + (v === viewName ? 'btn-primary' : 'btn-secondary') + ' btn-nav';
+        }
+        const tBtn = document.getElementById('top-nav-' + v);
+        if (tBtn) {
+          tBtn.className = 'btn ' + (v === viewName ? 'btn-primary' : 'btn-secondary') + ' btn-sm';
+        }
+      });
+    }
+
+    function toggleAuthForm() {
+      const box = document.getElementById('auth-form-box');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function performLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      try {
+        const res = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          json: { email, password }
+        });
+        state.token = res.access_token;
+        state.user = res.user;
+        document.getElementById('auth-user-name').textContent = res.user.full_name;
+        document.getElementById('auth-user-email').textContent = res.user.email;
+        document.getElementById('auth-form-box').style.display = 'none';
+        showToast('Sessão autenticada com sucesso.');
+        await refreshAllData();
+      } catch (err) {
+        showToast('Falha na autenticação: ' + err.message);
+      }
+    }
+
+    async function refreshAllData() {
+      try {
+        const [stats, docs, convs] = await Promise.all([
+          apiFetch('/api/dashboard/stats'),
+          apiFetch('/api/documents'),
+          apiFetch('/api/conversations')
+        ]);
+        state.stats = stats;
+        state.documents = docs;
+        state.conversations = convs;
+
+        renderSidebarAndHero();
+        renderDashboard();
+        renderLibraryList();
+
+        if (!state.activeConversationId && convs.length > 0) {
+          state.activeConversationId = convs[0].id;
+        }
+        await loadActiveConversationMessages();
+        renderConversationsList();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderSidebarAndHero() {
+      if (!state.stats) return;
+      const s = state.stats;
+      document.getElementById('side-stat-docs').textContent = s.indexed_documents + ' indexados';
+      document.getElementById('side-stat-chunks').textContent = s.total_chunks + ' vetores';
+      document.getElementById('hero-step-1').textContent =
+        `Extração higienizada de PDF, DOCX, Markdown e TXT (${s.total_documents} documentos ativos).`;
+      document.getElementById('hero-step-4').textContent =
+        `Similaridade de cosseno HNSW sobre ${s.total_chunks} fragmentos indexados (768d).`;
+    }
+
+    function renderDashboard() {
+      if (!state.stats) return;
+      const s = state.stats;
+      const p = s.pipeline || {};
+      document.getElementById('dash-indexed-badge').textContent = s.indexed_documents + ' ativos';
+      document.getElementById('dash-total-docs').textContent = s.total_documents;
+      document.getElementById('dash-total-bytes').textContent = 'Volume: ' + formatBytes(s.total_bytes);
+      document.getElementById('dash-total-chunks').textContent = s.total_chunks;
+      document.getElementById('dash-total-convs').textContent = s.total_conversations;
+      document.getElementById('dash-total-msgs').textContent = s.total_messages + ' interações registradas';
+      document.getElementById('dash-storage-mode').textContent = p.storage_mode || 'Supabase + pgvector (768d)';
+      document.getElementById('pipe-storage-text').textContent = p.storage_mode || 'Supabase + pgvector (768d)';
+      document.getElementById('pipe-supa-badge').textContent = p.supabase_connected ? 'Supabase Ativo' : 'Ativo';
+      document.getElementById('pipe-llm-model').textContent = p.llm_model || 'gemini-2.5-flash';
+      document.getElementById('pipe-emb-model').textContent = `${p.embedding_model || 'models/gemini-embedding-001'} (${p.embedding_dimension || 768}d)`;
+
+      const fb = s.format_breakdown || {};
+      const fbKeys = Object.keys(fb);
+      document.getElementById('dash-format-badges').innerHTML = fbKeys.length
+        ? fbKeys.map(k => `<span class="ka-badge ka-badge-neutral" style="margin-right:6px;">${escapeHtml(k)}: ${fb[k]}</span>`).join('')
+        : '<span style="font-size:13px;color:var(--color-graphite);">Sem arquivos</span>';
+
+      const recent = s.recent_documents || [];
+      const container = document.getElementById('dash-recent-docs-list');
+      if (!recent.length) {
+        container.innerHTML = '<div class="ka-card-cloud">Nenhum documento indexado ainda.</div>';
+        return;
+      }
+      container.innerHTML = recent.map(doc => `
+        <div class="ka-card" style="padding: 16px 24px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div>
+              <div style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">${escapeHtml(doc.filename)}</div>
+              <div style="font-size: 12px; color: var(--color-graphite);">
+                ${doc.chunk_count} fragmentos vetoriais · ${formatBytes(doc.file_size)} · Atualizado em ${formatDate(doc.updated_at)}
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="ka-badge ka-badge-neutral">${escapeHtml(doc.file_type)}</span>
+              <span class="ka-badge ka-badge-violet"><span class="status-dot"></span>Indexado</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderLibraryList() {
+      const q = (document.getElementById('lib-search-input').value || '').trim().toLowerCase();
+      const fmt = document.getElementById('lib-format-filter').value;
+      const filtered = state.documents.filter(d => {
+        const matchName = !q || d.filename.toLowerCase().includes(q);
+        const matchFmt = fmt === 'ALL' || (d.file_type || '').toUpperCase() === fmt;
+        return matchName && matchFmt;
+      });
+
+      const container = document.getElementById('lib-documents-container');
+      if (!filtered.length) {
+        container.innerHTML = '<div class="ka-card-cloud">Nenhum documento corresponde aos filtros selecionados.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(doc => {
+        const chunks = state.inspectedChunksByDoc[doc.id];
+        const chunksHtml = chunks ? `
+          <div class="ka-card-cloud" style="margin-top: 12px;">
+            <div style="font-size: 13px; font-weight: 600; color: var(--color-iris); margin-bottom: 12px;">
+              Fragmentos Vetoriais Indexados — ${escapeHtml(doc.filename)} (${chunks.length} trechos)
+            </div>
+            ${chunks.map(ch => `
+              <div class="citation-card" style="background-color: var(--color-white);">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <strong style="font-size:13px;">Trecho #${ch.chunk_index}</strong>
+                  <span class="ka-badge ka-badge-neutral">${ch.token_count} palavras · 768d vector</span>
+                </div>
+                <div class="citation-excerpt">${escapeHtml(ch.content)}</div>
+              </div>
+            `).join('')}
+          </div>
+        ` : '';
+
+        return `
+          <div class="ka-card" style="padding: 20px 24px; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                  <span style="font-size: 16px; font-weight: 600;">${escapeHtml(doc.filename)}</span>
+                  <span class="ka-badge ka-badge-neutral">${escapeHtml(doc.file_type)}</span>
+                  <span class="ka-badge ka-badge-violet"><span class="status-dot"></span>Indexado</span>
+                </div>
+                <div style="font-size: 13px; color: var(--color-iron);">
+                  <strong>${doc.chunk_count}</strong> fragmentos vetoriais · Tamanho: <strong>${formatBytes(doc.file_size)}</strong> · Indexado em ${formatDate(doc.updated_at)}
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="toggleInspectChunks('${doc.id}')">
+                  ${chunks ? 'Ocultar Fragmentos' : 'Inspecionar Fragmentos'}
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="switchView('assistente')">Consultar no Assistente</button>
+                <button class="btn btn-secondary btn-sm" onclick="reindexDocument('${doc.id}')">Reindexar</button>
+                <button class="btn btn-secondary btn-sm" onclick="deleteDocument('${doc.id}')">Excluir</button>
+              </div>
+            </div>
+            ${chunksHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function uploadDocument() {
+      const fileInput = document.getElementById('doc-file-input');
+      if (!fileInput.files || !fileInput.files.length) {
+        showToast('Selecione um arquivo (.pdf, .docx, .md ou .txt) para enviar.');
+        return;
+      }
+      const btn = document.getElementById('btn-upload-doc');
+      btn.disabled = true;
+      btn.textContent = 'Indexando no pgvector...';
+      try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        const res = await apiFetch('/api/documents/upload', {
+          method: 'POST',
+          body: formData
+        });
+        fileInput.value = '';
+        showToast(`Documento '${res.filename}' indexado com sucesso (${res.chunk_count} fragmentos).`);
+        await refreshAllData();
+      } catch (err) {
+        showToast('Erro no upload: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Processar e Indexar';
+      }
+    }
+
+    async function toggleInspectChunks(docId) {
+      if (state.inspectedChunksByDoc[docId]) {
+        delete state.inspectedChunksByDoc[docId];
+        renderLibraryList();
+        return;
+      }
+      try {
+        const chunks = await apiFetch(`/api/documents/${docId}/chunks`);
+        state.inspectedChunksByDoc[docId] = chunks;
+        renderLibraryList();
+      } catch (err) {
+        showToast('Erro ao carregar fragmentos: ' + err.message);
+      }
+    }
+
+    async function reindexDocument(docId) {
+      try {
+        showToast('Reindexando documento em 768 dimensões...');
+        await apiFetch(`/api/documents/${docId}/reindex`, { method: 'POST' });
+        showToast('Documento reindexado com sucesso.');
+        await refreshAllData();
+      } catch (err) {
+        showToast('Falha ao reindexar: ' + err.message);
+      }
+    }
+
+    async function deleteDocument(docId) {
+      try {
+        await apiFetch(`/api/documents/${docId}`, { method: 'DELETE' });
+        delete state.inspectedChunksByDoc[docId];
+        showToast('Documento excluído.');
+        await refreshAllData();
+      } catch (err) {
+        showToast('Erro ao excluir: ' + err.message);
+      }
+    }
+
+    function renderConversationsList() {
+      const container = document.getElementById('conv-history-list');
+      if (!state.conversations.length) {
+        container.innerHTML = '<div class="ka-card-cloud" style="padding:12px;font-size:13px;">Nenhuma conversa anterior.</div>';
+        return;
+      }
+      container.innerHTML = state.conversations.map(c => {
+        const isCurrent = c.id === state.activeConversationId;
+        const shortTitle = c.title.length > 28 ? c.title.slice(0, 28) + '...' : c.title;
+        return `
+          <button class="btn ${isCurrent ? 'btn-primary' : 'btn-secondary'} btn-sm" style="width:100%;justify-content:space-between;" onclick="selectConversation('${c.id}')">
+            <span>${escapeHtml(shortTitle)}</span>
+            <span style="font-size:11px;opacity:0.8;">(${c.message_count})</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    async function selectConversation(convId) {
+      state.activeConversationId = convId;
+      state.activeCitations = [];
+      renderConversationsList();
+      await loadActiveConversationMessages();
+    }
+
+    async function createNewConversation() {
+      try {
+        const created = await apiFetch('/api/conversations', {
+          method: 'POST',
+          json: { title: 'Nova Consulta Documental' }
+        });
+        state.activeConversationId = created.id;
+        state.activeCitations = [];
+        await refreshAllData();
+      } catch (err) {
+        showToast('Erro ao criar conversa: ' + err.message);
+      }
+    }
+
+    async function deleteActiveConversation() {
+      if (!state.activeConversationId) return;
+      try {
+        await apiFetch(`/api/conversations/${state.activeConversationId}`, { method: 'DELETE' });
+        state.activeConversationId = null;
+        state.messages = [];
+        state.activeCitations = [];
+        await refreshAllData();
+      } catch (err) {
+        showToast('Erro ao excluir conversa: ' + err.message);
+      }
+    }
+
+    async function loadActiveConversationMessages() {
+      if (!state.activeConversationId) {
+        state.messages = [];
+        renderChatAndReferences();
+        return;
+      }
+      try {
+        const msgs = await apiFetch(`/api/conversations/${state.activeConversationId}/messages`);
+        state.messages = msgs;
+        if (!state.activeCitations.length && msgs.length) {
+          for (let i = msgs.length - 1; i >= 0; i--) {
+            if (msgs[i].role === 'assistant' && msgs[i].citations && msgs[i].citations.length) {
+              state.activeCitations = msgs[i].citations;
+              break;
+            }
+          }
+        }
+        renderChatAndReferences();
+      } catch (_) {
+        state.messages = [];
+        renderChatAndReferences();
+      }
+    }
+
+    function renderChatAndReferences() {
+      const chatContainer = document.getElementById('chat-messages-container');
+      if (!state.messages.length) {
+        chatContainer.innerHTML = `
+          <div class="ka-card" style="padding: 32px; text-align: center;">
+            <div style="margin-bottom: 12px;"><span class="ka-badge ka-badge-violet">Assistente RAG Pronto</span></div>
+            <h3 style="font-size: 20px; margin-bottom: 8px;">Inicie uma Consulta Documental</h3>
+            <p style="font-size: 14px; color: var(--color-iron); max-width: 520px; margin: 0 auto;">
+              Utilize o campo acima ou selecione uma das consultas sugeridas para recuperar fragmentos vetoriais
+              no Supabase pgvector e receber respostas estruturadas com citações verificáveis.
+            </p>
+          </div>
+        `;
+      } else {
+        chatContainer.innerHTML = state.messages.map(msg => {
+          if (msg.role === 'user') {
+            return `
+              <div class="chat-msg-user">
+                <div class="chat-role-header" style="color: var(--color-iron);">
+                  <span>PERGUNTA DO USUÁRIO</span>
+                  <span style="font-weight: 400; color: var(--color-graphite);">${formatDate(msg.created_at)}</span>
+                </div>
+                <div style="font-size: 15px; font-weight: 500;">${escapeHtml(msg.content)}</div>
+              </div>
+            `;
+          }
+          const cits = msg.citations || [];
+          const pills = cits.map(c =>
+            `<span class="ka-badge ka-badge-violet" style="margin-right:6px;margin-top:6px;">${escapeHtml(c.filename)} · Trecho #${c.chunk_index} (${Math.round(c.similarity * 100)}%)</span>`
+          ).join('');
+          return `
+            <div class="chat-msg-assistant">
+              <div class="chat-role-header" style="color: var(--color-iris);">
+                <span>◈ RESPOSTA ESTRUTURADA · KNOWLEDGE ASSISTANT</span>
+                <span style="font-weight: 400; color: var(--color-graphite);">${formatDate(msg.created_at)}</span>
+              </div>
+              <div class="chat-content">${formatMarkdownSimple(msg.content)}</div>
+              ${pills ? `
+                <div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-mist);">
+                  <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-graphite); margin-bottom: 4px;">
+                    Fontes Citadas nesta Resposta:
+                  </div>
+                  <div>${pills}</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      }
+
+      const refContainer = document.getElementById('references-panel-container');
+      const cits = state.activeCitations || [];
+      if (!cits.length) {
+        refContainer.innerHTML = `
+          <div class="ka-card-cloud">
+            <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Aguardando Consulta</div>
+            <p style="font-size: 13px; color: var(--color-iron);">
+              Os fragmentos recuperados via busca semântica no pgvector serão exibidos aqui com seu score de similaridade e trecho original.
+            </p>
+          </div>
+        `;
+      } else {
+        refContainer.innerHTML = `
+          <div style="margin-bottom: 12px;">
+            <span class="ka-badge ka-badge-violet">${cits.length} fragmentos recuperados</span>
+          </div>
+          ${cits.map(cit => `
+            <div class="citation-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span class="ka-badge ka-badge-violet">Trecho #${cit.chunk_index} · ${Math.round(cit.similarity * 100)}% relevância</span>
+                <span class="ka-badge ka-badge-neutral">${escapeHtml(cit.file_type)}</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;">${escapeHtml(cit.filename)}</div>
+              <div class="citation-excerpt">${escapeHtml(cit.excerpt)}</div>
+            </div>
+          `).join('')}
+        `;
+      }
+    }
+
+    function askSuggested(questionText) {
+      document.getElementById('chat-question-input').value = questionText;
+      submitQuestion();
+    }
+
+    async function submitQuestion() {
+      const input = document.getElementById('chat-question-input');
+      const question = input.value.trim();
+      if (!question) return;
+
+      const btn = document.getElementById('btn-send-question');
+      btn.disabled = true;
+      btn.textContent = 'Consultando pgvector & Gemini...';
+      try {
+        const res = await apiFetch('/api/chat/query', {
+          method: 'POST',
+          json: {
+            question,
+            conversation_id: state.activeConversationId,
+            top_k: 4
+          }
+        });
+        input.value = '';
+        state.activeConversationId = res.conversation_id;
+        state.activeCitations = res.citations || [];
+        await refreshAllData();
+      } catch (err) {
+        showToast('Erro na consulta RAG: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Consultar Base RAG →';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const auth = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          json: { email: 'admin@knowledge.ai', password: 'admin123' }
+        });
+        state.token = auth.access_token;
+        state.user = auth.user;
+      } catch (_) {}
+      await refreshAllData();
+    });
+  </script>
+</body>
+</html>

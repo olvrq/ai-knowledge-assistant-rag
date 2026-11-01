@@ -1,8 +1,10 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Optional
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
 from backend.config import settings
 from backend.database import repository
@@ -103,10 +105,20 @@ def _resolve_client_key(request: Request, user: Optional[UserInfo]) -> str:
 
 
 # -----------------------------------------------------------------------------
-# ROOT & HEALTH STATUS
+# ROOT WEB UI (UNIFIED VERCEL DEPLOY) & HEALTH STATUS
 # -----------------------------------------------------------------------------
-@app.get("/", tags=["System"])
-async def root_status() -> dict[str, str]:
+_WEB_UI_PATH = Path(__file__).resolve().parent / "web_ui.html"
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def root_web_ui() -> HTMLResponse:
+    if _WEB_UI_PATH.exists():
+        return HTMLResponse(content=_WEB_UI_PATH.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>AI Knowledge Assistant Online</h1>")
+
+
+@app.get("/api/status", tags=["System"])
+async def api_status() -> dict[str, str]:
     return {
         "service": settings.APP_NAME,
         "version": settings.APP_VERSION,

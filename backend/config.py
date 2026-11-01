@@ -53,9 +53,11 @@ class Settings:
     BACKEND_HOST: str = os.getenv("BACKEND_HOST", "127.0.0.1")
     BACKEND_PORT: int = int(os.getenv("BACKEND_PORT", "8000"))
 
-    # CORS Origins (Restricts to official Streamlit Cloud domain and localhost)
+    # CORS Origins (Restricts to official Vercel domain and localhost)
     DEFAULT_CORS_ORIGINS: str = (
-        "https://ai-knowledge-assistant-ragg.streamlit.app,"
+        "https://ai-knowledge-assistant-ragg.vercel.app,"
+        "http://localhost:8000,"
+        "http://127.0.0.1:8000,"
         "http://localhost:8501,"
         "http://127.0.0.1:8501"
     )

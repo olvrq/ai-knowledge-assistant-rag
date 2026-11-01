@@ -13,7 +13,7 @@ Plataforma SaaS de Inteligência Artificial especializada em **conhecimento docu
 5. [Demonstração e Screenshots](#5-demonstração-e-screenshots)
 6. [Configuração do Supabase e pgvector](#6-configuração-do-supabase-e-pgvector)
 7. [Instalação e Execução Local](#7-instalação-e-execução-local)
-8. [Deploy em Produção (Vercel + Streamlit Community Cloud)](#8-deploy-em-produção-vercel--streamlit-community-cloud)
+8. [Deploy Centralizado em Produção (Vercel)](#8-deploy-centralizado-em-produção-vercel)
 9. [Segurança, Controle de Custos e Limitações Serverless](#9-segurança-controle-de-custos-e-limitações-serverless)
 10. [Testes Automatizados](#10-testes-automatizados)
 
@@ -39,7 +39,7 @@ O **AI Knowledge Assistant** resolve o desafio corporativo de consultar acervos 
 
 ```mermaid
 flowchart LR
-    UI["Frontend Streamlit\n(Streamlit Community Cloud)"] -->|REST JSON + JWT| API["Backend FastAPI\n(Vercel Serverless / Uvicorn)"]
+    UI["Frontend Web UI (SPA)\n& Streamlit (Local)"] -->|REST JSON + JWT| API["Backend FastAPI\n(Vercel Serverless / Uvicorn)"]
     API -->|Chunking Semântico| LC["LangChain\nRecursiveCharacterTextSplitter"]
     LC -->|Vetorização 768d MRL| EMB["Google Gemini API\nmodels/gemini-embedding-001"]
     EMB -->|Armazenamento & Busca HNSW| DB[("Supabase PostgreSQL\npgvector vector(768)")]
@@ -60,7 +60,8 @@ flowchart LR
 
 | Camada | Tecnologia | Função no Projeto |
 | :--- | :--- | :--- |
-| **Frontend** | Streamlit + CSS Custom Properties (`Inter`) | Interface SaaS responsiva seguindo a Direção Visual Oficial |
+| **Frontend Web (Vercel)** | HTML5 + CSS Custom Properties (`Inter`) + Vanilla JS | Interface SaaS unificada servida diretamente na raiz `/` da Vercel |
+| **Frontend Local** | Streamlit + CSS Custom Properties (`Inter`) | Interface complementar para execução local interativa |
 | **Backend API** | FastAPI + Uvicorn + Pydantic v2 | API RESTful, validação de contratos, autenticação e segurança |
 | **Orquestração RAG** | LangChain (`langchain-google-genai`, `langchain-text-splitters`) | Segmentação contextual, templates de prompt e cadeia RAG |
 | **LLM (Geração)** | Google Gemini API (`gemini-2.5-flash`) | Síntese executiva estruturada com aterramento documental |
@@ -75,33 +76,34 @@ flowchart LR
 ```text
 Assistant/
 ├── .streamlit/
-│   └── config.toml                # Configuração de tema e servidor do Streamlit
+│   └── config.toml                # Configuração de tema e servidor do Streamlit (uso local)
 ├── api/
-│   └── index.py                   # Entrypoint ASGI para deploy Serverless na Vercel
+│   └── index.py                   # Entrypoint ASGI para deploy Serverless centralizado na Vercel
 ├── backend/
 │   ├── __init__.py
 │   ├── config.py                  # Configurações centralizadas via variáveis de ambiente
 │   ├── database.py                # Repositório Supabase pgvector (768d) + fallback SQLite local
-│   ├── main.py                    # Aplicação FastAPI, rotas REST e middlewares CORS/Auth
+│   ├── main.py                    # Aplicação FastAPI, Web UI em `/` e rotas REST `/api/*`
 │   ├── rag_pipeline.py            # Extração, chunking LangChain, embeddings Gemini e síntese RAG
 │   ├── schemas.py                 # Modelos Pydantic v2 de requisição e resposta
-│   └── security.py                # JWT, hashing de senhas, Rate Limiting e sanitização
+│   ├── security.py                # JWT, hashing de senhas, Rate Limiting e sanitização
+│   └── web_ui.html                # Aplicação Web SaaS completa (Specify Design System) servida na Vercel
 ├── frontend/
 │   ├── styles/
 │   │   └── specify_theme.css      # Design System CSS oficial (Paleta, Tipografia Inter, Grid 8px)
-│   ├── api_client.py              # Cliente HTTP integrado ao backend FastAPI (remoto ou local)
+│   ├── api_client.py              # Cliente HTTP integrado ao backend FastAPI
 │   ├── app.py                     # Aplicação Streamlit (Início, Dashboard, Biblioteca, Assistente)
-│   └── requirements.txt           # Dependências específicas para o Streamlit Community Cloud
+│   └── requirements.txt           # Dependências completas para execução local com Streamlit
 ├── supabase/
 │   └── schema.sql                 # Script SQL completo (tabelas, vector(768), HNSW, RPC e RLS)
 ├── tests/
 │   └── test_gemini_rag.py         # Suíte de testes automatizados de arquitetura, RAG e segurança
 ├── .env.example                   # Template de variáveis de ambiente (sem chaves secretas)
 ├── .gitignore                     # Regras de exclusão do Git (proteção de .env e bancos locais)
-├── .vercelignore                  # Exclusão de arquivos de frontend/testes no bundle da Vercel
+├── .vercelignore                  # Exclusão de arquivos de testes/bancos locais no bundle da Vercel
 ├── DESIGN_SYSTEM.md               # Documentação da Direção Visual Oficial
 ├── README.md                      # Documentação principal do projeto
-├── requirements.txt               # Dependências enxutas do Backend (compatível com Vercel)
+├── requirements.txt               # Dependências enxutas de Produção (compatível com Vercel)
 ├── run_assistant.ps1              # Script PowerShell para inicialização local automatizada
 └── vercel.json                    # Configuração de rotas e funções Serverless da Vercel
 ```
@@ -110,10 +112,8 @@ Assistant/
 
 ## 5. Demonstração e Screenshots
 
-> **Nota**: Preencha os links e imagens abaixo após realizar o deploy do seu ambiente.
-
-### Links do Ambiente Publicado
-- **Frontend (Streamlit Community Cloud)**: [https://ai-knowledge-assistant-ragg.streamlit.app/](https://ai-knowledge-assistant-ragg.streamlit.app/)
+### Links do Ambiente Publicado (Centralizado na Vercel)
+- **Aplicação Web SaaS Completa (Vercel)**: [https://ai-knowledge-assistant-ragg.vercel.app/](https://ai-knowledge-assistant-ragg.vercel.app/)
 - **Backend API & Swagger Docs (Vercel)**: [https://ai-knowledge-assistant-ragg.vercel.app/docs](https://ai-knowledge-assistant-ragg.vercel.app/docs)
 - **Health Check do Pipeline RAG (Vercel)**: [https://ai-knowledge-assistant-ragg.vercel.app/api/health](https://ai-knowledge-assistant-ragg.vercel.app/api/health)
 
@@ -179,17 +179,17 @@ Assistant/
 
 ---
 
-## 8. Deploy em Produção (Vercel + Streamlit Community Cloud)
+## 8. Deploy Centralizado em Produção (Vercel)
 
-Por boas práticas arquiteturais, o **Backend FastAPI** é hospedado como API Serverless na **Vercel** e o **Frontend Streamlit** é hospedado no **Streamlit Community Cloud** (evitando conexões WebSocket incompatíveis com funções serverless da Vercel).
+O projeto possui **deploy 100% centralizado na Vercel**: o **Backend FastAPI** e a **Interface Web SaaS completa** (`backend/web_ui.html`, construída sob o Design System Specify) são servidos na mesma aplicação Serverless em `https://ai-knowledge-assistant-ragg.vercel.app/`, eliminando a dependência de plataformas secundárias.
 
-### Etapa 1 — Deploy do Backend FastAPI na Vercel
+### Passo a Passo para Deploy na Vercel
 1. Importe o repositório GitHub na [Vercel](https://vercel.com/).
-2. A Vercel detectará automaticamente o arquivo [`vercel.json`](./vercel.json) e o entrypoint [`api/index.py`](./api/index.py), instalando apenas as dependências enxutas do [`requirements.txt`](./requirements.txt) da raiz.
+2. A Vercel detectará automaticamente o arquivo [`vercel.json`](./vercel.json) e o entrypoint [`api/index.py`](./api/index.py), instalando as dependências enxutas do [`requirements.txt`](./requirements.txt) da raiz e servindo tanto a interface visual em `/` quanto as rotas REST em `/api/*` e `/docs`.
 3. Em **Project Settings > Environment Variables**, configure:
    - `APP_ENV=production`
-   - `ENABLE_SEED_DOCUMENTS=false`
-   - `DEMO_AUTO_LOGIN=false`
+   - `ENABLE_SEED_DOCUMENTS=true`
+   - `DEMO_AUTO_LOGIN=true`
    - `GEMINI_API_KEY=<sua-chave-gemini>`
    - `GEMINI_LLM_MODEL=gemini-2.5-flash`
    - `GEMINI_EMBEDDING_MODEL=models/gemini-embedding-001`
@@ -198,20 +198,12 @@ Por boas práticas arquiteturais, o **Backend FastAPI** é hospedado como API Se
    - `SUPABASE_KEY=<sua-anon-key>`
    - `SUPABASE_SERVICE_ROLE_KEY=<sua-service-role-key>`
    - `JWT_SECRET_KEY=<segredo-forte-aleatorio>`
-   - `CORS_ALLOWED_ORIGINS=https://<seu-app>.streamlit.app`
+   - `CORS_ALLOWED_ORIGINS=https://ai-knowledge-assistant-ragg.vercel.app`
    - `MAX_UPLOAD_SIZE_MB=4`
-4. Realize o deploy e valide o endpoint de saúde em `https://<seu-backend>.vercel.app/api/health`.
-
-### Etapa 2 — Deploy do Frontend no Streamlit Community Cloud
-1. Acesse o [Streamlit Community Cloud](https://share.streamlit.io/) e clique em **Create app**.
-2. Selecione o mesmo repositório GitHub, a branch principal (`main`) e defina:
-   - **Main file path**: `frontend/app.py` (o Streamlit Cloud instalará automaticamente [`frontend/requirements.txt`](./frontend/requirements.txt)).
-3. Em **Advanced settings > Secrets**, adicione apenas a URL pública do backend (nunca adicione a `GEMINI_API_KEY` no frontend):
-   ```toml
-   BACKEND_API_URL = "https://<seu-backend>.vercel.app"
-   APP_ENV = "production"
-   DEMO_AUTO_LOGIN = "false"
-   ```
+4. Realize o deploy e acesse:
+   - **Interface Web Completa**: `https://<seu-app>.vercel.app/`
+   - **Documentação Interativa (Swagger)**: `https://<seu-app>.vercel.app/docs`
+   - **Diagnóstico de Saúde**: `https://<seu-app>.vercel.app/api/health`
 
 ---
 
