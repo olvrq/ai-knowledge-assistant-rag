@@ -48,6 +48,36 @@
     }
 
     /* ===================================================================
+       VARIÁVEIS DE ALTO CONTRASTE WCAG AA/AAA PARA TAGS, BADGES & CITAÇÕES
+       =================================================================== */
+    :root,
+    html.dark {
+      --tag-bg: #3B0764;      /* Roxo escuro intermediário (purple-950) */
+      --tag-text: #F3E8FF;    /* Roxo claro / branco legível (purple-100) */
+      --tag-border: #6B21A8;  /* Borda roxa nítida (purple-800) */
+    }
+
+    html.light {
+      --tag-bg: #F3E8FF;      /* Roxo bem claro/suave (purple-100) */
+      --tag-text: #581C87;    /* Roxo escuro legível (purple-900) */
+      --tag-border: #E9D5FF;  /* Borda suave (purple-200) */
+    }
+
+    .ka-tag-badge,
+    code {
+      background-color: var(--tag-bg) !important;
+      color: var(--tag-text) !important;
+      border: 1px solid var(--tag-border) !important;
+      font-weight: 600;
+    }
+
+    .ka-tag-badge *,
+    code *,
+    strong > code {
+      color: var(--tag-text) !important;
+    }
+
+    /* ===================================================================
        SUPORTE COMPLETO AO MODO CLARO (html.light) E MODO ESCURO (html.dark)
        =================================================================== */
     html.light,
@@ -76,10 +106,16 @@
     html.light .bg-slate-900\/40 {
       background-color: #ffffff !important;
     }
+    html.light .bg-slate-800 {
+      background-color: #f1f5f9 !important;
+      color: #334155 !important;
+      border-color: #cbd5e1 !important;
+    }
     html.light .hover\:bg-slate-800:hover,
     html.light .hover\:bg-slate-800\/80:hover,
-    html.light .hover\:bg-slate-800\/50:hover {
-      background-color: #f1f5f9 !important;
+    html.light .hover\:bg-slate-800\/50:hover,
+    html.light .hover\:bg-slate-700:hover {
+      background-color: #e2e8f0 !important;
     }
     html.light .border-slate-900,
     html.light .border-slate-800,
@@ -101,19 +137,27 @@
       color: #64748b !important;
     }
     html.light .bg-purple-950,
+    html.light .bg-purple-950\/50,
     html.light .bg-purple-950\/60,
     html.light .bg-purple-950\/70,
-    html.light .bg-purple-950\/50 {
-      background-color: #f3e8ff !important;
-      color: #6b21a8 !important;
-      border-color: #d8b4fe !important;
+    html.light .bg-purple-950\/80 {
+      background-color: var(--tag-bg) !important;
+      color: var(--tag-text) !important;
+      border-color: var(--tag-border) !important;
+    }
+    html.light .bg-purple-950 *,
+    html.light .bg-purple-950\/50 *,
+    html.light .bg-purple-950\/60 *,
+    html.light .bg-purple-950\/70 *,
+    html.light .bg-purple-950\/80 * {
+      color: var(--tag-text) !important;
     }
     html.light .text-purple-300,
     html.light .text-purple-200 {
-      color: #6b21a8 !important;
+      color: #581C87 !important;
     }
     html.light .text-purple-400 {
-      color: #7c3aed !important;
+      color: #6B21A8 !important;
     }
     html.light .bg-purple-600,
     html.light .bg-purple-600 * {
@@ -532,9 +576,10 @@
 
     function formatMarkdown(text) {
       let html = escapeHtml(text || '');
-      html = html.replace(/^### (.*)$/gm, '<strong class="block text-purple-300 text-sm mt-3 mb-1">$1</strong>');
+      html = html.replace(/^### (.*)$/gm, '<strong class="block text-purple-400 text-sm mt-3 mb-1">$1</strong>');
+      html = html.replace(/\*\*`([^`]+)`\*\*/g, '<code class="ka-tag-badge px-1.5 py-0.5 rounded-md text-xs font-semibold">$1</code>');
       html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
-      html = html.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-purple-950/80 text-purple-300 border border-purple-800/40 text-xs">$1</code>');
+      html = html.replace(/`([^`]+)`/g, '<code class="ka-tag-badge px-1.5 py-0.5 rounded-md text-xs font-medium">$1</code>');
       html = html.replace(/\n/g, '<br/>');
       return html;
     }
@@ -761,7 +806,7 @@
         const citationsHtml = cits.length ? `
           <div class="mt-3 pt-2.5 border-t border-slate-800 flex flex-wrap gap-1.5">
             ${cits.map(c => `
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] bg-purple-950/70 text-purple-300 border border-purple-800/40">
+              <span class="ka-tag-badge inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold">
                 ${escapeHtml(c.filename)} · Trecho #${c.chunk_index} (${Math.round((c.similarity || 0) * 100)}%)
               </span>
             `).join('')}

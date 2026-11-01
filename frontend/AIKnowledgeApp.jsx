@@ -257,7 +257,7 @@ export default function AIKnowledgeApp() {
                 <Activity size={14} className="text-purple-500" /> Pipeline RAG
               </span>
               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] border font-semibold ${
-                isDarkMode ? 'bg-purple-950 text-purple-300 border-purple-800/50' : 'bg-purple-50 text-purple-700 border-purple-200'
+                isDarkMode ? 'bg-purple-950 text-purple-100 border-purple-800' : 'bg-purple-100 text-purple-900 border-purple-200'
               }`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span> 768d Ativo
               </span>
@@ -359,7 +359,7 @@ export default function AIKnowledgeApp() {
               <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>Status da Conexão com Banco Vetorial</h3>
               <div className={`space-y-3 text-xs ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                 <div className={`flex justify-between p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-                  <span>Função RPC: <code className="text-purple-500">match_document_chunks</code></span>
+                  <span>Função RPC: <code className={`px-1.5 py-0.5 rounded-md border font-semibold ${isDarkMode ? 'bg-purple-950 text-purple-100 border-purple-800' : 'bg-purple-100 text-purple-900 border-purple-200'}`}>match_document_chunks</code></span>
                   <span className="text-emerald-500 font-medium">Operacional (Latência: 42ms)</span>
                 </div>
                 <div className={`flex justify-between p-3 rounded-2xl border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
@@ -427,7 +427,23 @@ export default function AIKnowledgeApp() {
                             ? 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-xs shadow-sm'
                             : 'bg-white border border-slate-200 text-slate-800 rounded-bl-xs shadow-sm')
                     }`}>
-                      {msg.content}
+                      <div>{msg.content}</div>
+                      {msg.citations && msg.citations.length > 0 && (
+                        <div className={`mt-3 pt-2.5 border-t flex flex-wrap gap-1.5 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+                          {msg.citations.map((c, cIdx) => (
+                            <span
+                              key={cIdx}
+                              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold border ${
+                                isDarkMode
+                                  ? 'bg-purple-950 text-purple-100 border-purple-800'
+                                  : 'bg-purple-100 text-purple-900 border-purple-200'
+                              }`}
+                            >
+                              {c.filename} · Trecho #{c.chunk_index} ({Math.round((c.similarity || 0) * 100)}%)
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
