@@ -47,6 +47,13 @@ async def lifespan(_app: FastAPI):
     yield
 
 
+if settings.ENABLE_SEED_DOCUMENTS:
+    try:
+        ensure_seed_documents()
+    except Exception:
+        pass
+
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,

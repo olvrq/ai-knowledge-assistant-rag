@@ -84,13 +84,13 @@ class Settings:
         os.getenv("RATE_LIMIT_REQUESTS_PER_MINUTE", "30")
     )
 
-    # Seed & Demo Controls (disabled by default on serverless cold starts)
+    # Seed & Demo Controls (seeds initial enterprise docs only when repository is empty)
     ENABLE_SEED_DOCUMENTS: bool = (
-        os.getenv("ENABLE_SEED_DOCUMENTS", "false" if IS_PRODUCTION else "true").strip().lower()
+        os.getenv("ENABLE_SEED_DOCUMENTS", "true").strip().lower()
         in ("1", "true", "yes")
     )
     DEMO_AUTO_LOGIN: bool = (
-        os.getenv("DEMO_AUTO_LOGIN", "false" if IS_PRODUCTION else "true").strip().lower()
+        os.getenv("DEMO_AUTO_LOGIN", "true").strip().lower()
         in ("1", "true", "yes")
     )
 

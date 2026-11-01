@@ -113,8 +113,9 @@ Assistant/
 > **Nota**: Preencha os links e imagens abaixo após realizar o deploy do seu ambiente.
 
 ### Links do Ambiente Publicado
-- **Frontend (Streamlit Community Cloud)**: `[ Inserir URL após deploy no Streamlit Cloud ]`
-- **Backend API & Swagger Docs (Vercel)**: `[ Inserir URL após deploy na Vercel ]/docs`
+- **Frontend (Streamlit Community Cloud)**: [https://ai-knowledge-assistant-ragg.streamlit.app/](https://ai-knowledge-assistant-ragg.streamlit.app/)
+- **Backend API & Swagger Docs (Vercel)**: [https://ai-knowledge-assistant-ragg.vercel.app/docs](https://ai-knowledge-assistant-ragg.vercel.app/docs)
+- **Health Check do Pipeline RAG (Vercel)**: [https://ai-knowledge-assistant-ragg.vercel.app/api/health](https://ai-knowledge-assistant-ragg.vercel.app/api/health)
 
 ### Capturas de Tela
 - **Página Inicial (Hero & Pipeline RAG)**:

@@ -50,10 +50,7 @@ def init_session_state() -> None:
         st.session_state.show_auth_panel = False
 
     # Auto-authenticate default enterprise session in local/demo mode (controlled by DEMO_AUTO_LOGIN)
-    demo_login_raw = os.getenv(
-        "DEMO_AUTO_LOGIN",
-        "false" if os.getenv("APP_ENV", "").lower() == "production" else "true",
-    ).lower()
+    demo_login_raw = os.getenv("DEMO_AUTO_LOGIN", "true").lower()
     demo_auto_login = demo_login_raw in ("1", "true", "yes")
     if (
         demo_auto_login
