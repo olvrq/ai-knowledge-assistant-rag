@@ -136,15 +136,12 @@ export default function AIKnowledgeApp() {
                 <h1 className={`text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                   Knowledge Assistant
                 </h1>
-                <span className={`text-[10px] font-medium ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>
-                  Google Gemini · RAG 768d
-                </span>
               </div>
             </div>
           ) : (
             <div
               onClick={handleStartNewChat}
-              title="Knowledge Assistant · Google Gemini · RAG 768d"
+              title="Knowledge Assistant"
               className="mx-auto w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-md cursor-pointer"
             >
               <Sparkles size={18} className="text-white" />
