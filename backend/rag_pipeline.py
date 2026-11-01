@@ -335,24 +335,28 @@ def synthesize_rag_answer(
         match = re.search(r"use models/([a-zA-Z0-9\.\-_]+)", err_text)
         return match.group(1) if match else None
 
-    # 1. Try fast google-genai SDK / LangChain ChatGoogleGenerativeAI with strict timeout
+    # 1. Try google-genai SDK with automatic model resolution and 25s timeout
     if settings.is_gemini_configured and GOOGLE_GENAI_SDK_AVAILABLE:
         client = genai.Client(
             api_key=settings.GEMINI_API_KEY,
-            http_options={"timeout": 12000},
+            http_options={"timeout": 25000},
         )
-        models_to_try = [primary_model]
+        models_to_try = [primary_model, "gemini-2.5-flash-lite", "gemini-flash-latest"]
+        seen_models: set[str] = set()
         idx = 0
-        while idx < len(models_to_try) and idx < 2:
+        while idx < len(models_to_try) and len(seen_models) < 3:
             active_model = models_to_try[idx]
             idx += 1
+            if active_model in seen_models:
+                continue
+            seen_models.add(active_model)
             try:
                 resp = client.models.generate_content(
                     model=active_model,
                     contents=f"{system_instruction}\n\nPERGUNTA DO USUÁRIO:\n{question}",
                     config=genai_types.GenerateContentConfig(
                         temperature=settings.GEMINI_TEMPERATURE,
-                        max_output_tokens=settings.GEMINI_MAX_OUTPUT_TOKENS,
+                        max_output_tokens=min(1024, settings.GEMINI_MAX_OUTPUT_TOKENS),
                     ),
                 )
                 if resp and resp.text:
@@ -376,10 +380,8 @@ def synthesize_rag_answer(
                 err_str = str(exc)
                 gemini_error_note = sanitize_error_message(err_str)
                 rec = _extract_recommended_model(err_str)
-                if rec and rec not in models_to_try:
-                    models_to_try.append(rec)
-                elif "gemini-flash-latest" not in models_to_try:
-                    models_to_try.append("gemini-flash-latest")
+                if rec and rec not in seen_models:
+                    models_to_try.insert(idx, rec)
 
     # 2. Fallback to LangChain ChatGoogleGenerativeAI wrapper if google-genai SDK unavailable
     if settings.is_gemini_configured and LANGCHAIN_GEMINI_AVAILABLE and not GOOGLE_GENAI_SDK_AVAILABLE:
