@@ -1,0 +1,569 @@
+/* ==========================================================================
+   DIREÇÃO VISUAL OFICIAL — AI KNOWLEDGE ASSISTANT
+   Linguagem visual inspirada na estética SaaS tecnológica Specify
+   Grade de espaçamento estrita: 8px (8, 16, 24, 32, 40, 48, 64px)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-iris: #624de3;
+  --color-soft-iris: #8d4af7;
+  --color-studio-slate: #1a1d1e;
+  --color-obsidian: #151718;
+  --color-white: #ffffff;
+  --color-cloud: #f6f7f9;
+  --color-mist: #ebedef;
+  --color-graphite: #8d8e8f;
+  --color-iron: #5f6162;
+  --color-noir: #000000;
+  --color-lilac-wash: #f1eefe;
+
+  /* Espaçamento base 8px */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+
+  /* Raios de borda oficiais */
+  --radius-card: 16px;
+  --radius-button: 40px;
+  --radius-input: 6px;
+
+  /* Sombras discretas (sem glassmorphism) */
+  --shadow-card: 0 2px 8px rgba(21, 23, 24, 0.04);
+  --shadow-card-hover: 0 4px 16px rgba(21, 23, 24, 0.07);
+}
+
+/* --------------------------------------------------------------------------
+   1. RESET E TIPOGRAFIA GLOBAL (INTER)
+   -------------------------------------------------------------------------- */
+html, body, [class*="css"], .stApp, .stMarkdown, p, span, div, label, input, textarea, button {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.stApp {
+  background-color: var(--color-white) !important;
+  color: var(--color-studio-slate) !important;
+}
+
+/* Ocultar cromos nativos desnecessários do Streamlit mantendo acessibilidade */
+#MainMenu {
+  visibility: hidden;
+}
+footer {
+  visibility: hidden;
+}
+header[data-testid="stHeader"] {
+  background-color: var(--color-white) !important;
+  border-bottom: 1px solid var(--color-mist);
+  height: 48px;
+}
+
+.block-container {
+  padding-top: var(--space-4) !important;
+  padding-bottom: var(--space-8) !important;
+  padding-left: var(--space-5) !important;
+  padding-right: var(--space-5) !important;
+  max-width: 1360px !important;
+}
+
+p, li {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-iron);
+  font-weight: 400;
+}
+
+h1, h2, h3, h4 {
+  color: var(--color-studio-slate);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   2. SIDEBAR / NAVEGAÇÃO LATERAL DISCRETA
+   -------------------------------------------------------------------------- */
+section[data-testid="stSidebar"] {
+  background-color: var(--color-cloud) !important;
+  border-right: 1px solid var(--color-mist) !important;
+}
+
+section[data-testid="stSidebar"] .block-container {
+  padding-top: var(--space-3) !important;
+  padding-left: var(--space-3) !important;
+  padding-right: var(--space-3) !important;
+  padding-bottom: var(--space-3) !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. BOTÕES (BORDER-RADIUS: 40PX, PRINCIPAL #1A1D1E, SECUNDÁRIO BRANCO)
+   -------------------------------------------------------------------------- */
+div.stButton > button,
+div.stFormSubmitButton > button,
+button[kind="primary"],
+button[kind="secondary"] {
+  border-radius: var(--radius-button) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  padding: 10px 24px !important;
+  min-height: 40px !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
+  box-shadow: none !important;
+}
+
+/* Botão Principal: fundo #1a1d1e e texto branco */
+div.stButton > button[kind="primary"],
+div.stFormSubmitButton > button[kind="primary"],
+div.stFormSubmitButton > button {
+  background-color: var(--color-studio-slate) !important;
+  color: var(--color-white) !important;
+  border: 1px solid var(--color-studio-slate) !important;
+}
+
+div.stButton > button[kind="primary"] *,
+div.stFormSubmitButton > button[kind="primary"] *,
+div.stFormSubmitButton > button * {
+  color: var(--color-white) !important;
+}
+
+div.stButton > button[kind="primary"]:hover,
+div.stFormSubmitButton > button:hover {
+  background-color: var(--color-noir) !important;
+  border-color: var(--color-iris) !important;
+  color: var(--color-white) !important;
+}
+
+/* Botão Secundário: fundo branco e borda discreta */
+div.stButton > button[kind="secondary"] {
+  background-color: var(--color-white) !important;
+  color: var(--color-studio-slate) !important;
+  border: 1px solid var(--color-mist) !important;
+}
+
+div.stButton > button[kind="secondary"] * {
+  color: var(--color-studio-slate) !important;
+}
+
+div.stButton > button[kind="secondary"]:hover {
+  background-color: var(--color-lilac-wash) !important;
+  border-color: var(--color-iris) !important;
+  color: var(--color-iris) !important;
+}
+
+div.stButton > button[kind="secondary"]:hover * {
+  color: var(--color-iris) !important;
+}
+
+div.stButton > button:focus-visible,
+div.stFormSubmitButton > button:focus-visible {
+  outline: 2px solid var(--color-iris) !important;
+  outline-offset: 2px !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. CAMPOS DE ENTRADA (BORDER-RADIUS: 6PX, FUNDO BRANCO, FOCO VIOLETA)
+   -------------------------------------------------------------------------- */
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] > div,
+div[data-baseweb="select"] > div {
+  background-color: var(--color-white) !important;
+  border: 1px solid var(--color-mist) !important;
+  border-radius: var(--radius-input) !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+div[data-baseweb="input"] input,
+div[data-baseweb="textarea"] textarea {
+  color: var(--color-studio-slate) !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  background-color: var(--color-white) !important;
+}
+
+div[data-baseweb="input"] > div:focus-within,
+div[data-baseweb="textarea"] > div:focus-within,
+div[data-baseweb="select"] > div:focus-within {
+  border-color: var(--color-iris) !important;
+  box-shadow: 0 0 0 3px var(--color-lilac-wash) !important;
+}
+
+/* File Uploader customizado na paleta */
+section[data-testid="stFileUploaderDropzone"] {
+  background-color: var(--color-cloud) !important;
+  border: 1px dashed var(--color-graphite) !important;
+  border-radius: var(--radius-card) !important;
+  padding: var(--space-3) !important;
+}
+
+section[data-testid="stFileUploaderDropzone"]:hover {
+  border-color: var(--color-iris) !important;
+  background-color: var(--color-lilac-wash) !important;
+}
+
+section[data-testid="stFileUploaderDropzone"] button {
+  border-radius: var(--radius-button) !important;
+  background-color: var(--color-white) !important;
+  border: 1px solid var(--color-mist) !important;
+  color: var(--color-studio-slate) !important;
+  font-weight: 600 !important;
+}
+
+/* --------------------------------------------------------------------------
+   5. SEÇÃO DE APRESENTAÇÃO ESCURA (HERO) E HEADLINE EM GRADIENTE VIOLETA
+   -------------------------------------------------------------------------- */
+.ka-hero-section {
+  background-color: var(--color-obsidian);
+  border: 1px solid var(--color-studio-slate);
+  border-radius: var(--radius-card);
+  padding: var(--space-8) var(--space-6);
+  margin-bottom: var(--space-4);
+  color: var(--color-white);
+}
+
+.ka-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background-color: var(--color-studio-slate);
+  border: 1px solid var(--color-iron);
+  color: var(--color-white);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: var(--radius-button);
+  margin-bottom: var(--space-3);
+}
+
+.ka-hero-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-iris);
+  display: inline-block;
+}
+
+.ka-hero-headline {
+  font-size: 56px;
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--color-white);
+  margin: 0 0 var(--space-3) 0;
+  max-width: 840px;
+}
+
+/* Gradiente violeta EXCLUSIVO para o título de destaque do hero */
+.ka-hero-headline-gradient {
+  background: linear-gradient(135deg, var(--color-iris) 0%, var(--color-soft-iris) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ka-hero-description {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--color-mist);
+  font-weight: 400;
+  max-width: 680px;
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* Representação Visual do Pipeline RAG dentro do Hero */
+.ka-pipeline-wrapper {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-studio-slate);
+}
+
+.ka-pipeline-label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-graphite);
+  margin-bottom: var(--space-2);
+}
+
+.ka-pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+}
+
+.ka-pipeline-node {
+  background-color: var(--color-studio-slate);
+  border: 1px solid var(--color-iron);
+  border-radius: var(--radius-card);
+  padding: var(--space-2);
+  position: relative;
+}
+
+.ka-pipeline-node-active {
+  border-color: var(--color-iris);
+}
+
+.ka-pipeline-step {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-soft-iris);
+  background-color: var(--color-obsidian);
+  padding: 4px 10px;
+  border-radius: var(--radius-button);
+  margin-bottom: var(--space-1);
+}
+
+.ka-pipeline-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-white);
+  margin-bottom: 4px;
+}
+
+.ka-pipeline-meta {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-graphite);
+}
+
+/* --------------------------------------------------------------------------
+   6. CARDS E SUPERFÍCIES INTERNAS (FUNDO BRANCO, BORDER-RADIUS 16PX)
+   -------------------------------------------------------------------------- */
+.ka-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-2);
+}
+
+.ka-card-cloud {
+  background-color: var(--color-cloud);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.ka-metric-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
+  height: 100%;
+}
+
+.ka-metric-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-iron);
+  margin-bottom: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ka-metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-studio-slate);
+  line-height: 1.15;
+  margin-bottom: var(--space-1);
+}
+
+.ka-metric-sub {
+  font-size: 12px;
+  color: var(--color-graphite);
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   7. BADGES DE FORMATO, STATUS E IDENTIDADE (PALETA ESTRITA)
+   -------------------------------------------------------------------------- */
+.ka-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-button);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ka-badge-violet {
+  background-color: var(--color-lilac-wash);
+  color: var(--color-iris);
+  border: 1px solid var(--color-lilac-wash);
+}
+
+.ka-badge-dark {
+  background-color: var(--color-studio-slate);
+  color: var(--color-white);
+}
+
+.ka-badge-neutral {
+  background-color: var(--color-cloud);
+  color: var(--color-iron);
+  border: 1px solid var(--color-mist);
+}
+
+.ka-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ka-status-dot-iris {
+  background-color: var(--color-iris);
+}
+
+.ka-status-dot-slate {
+  background-color: var(--color-studio-slate);
+}
+
+.ka-status-dot-graphite {
+  background-color: var(--color-graphite);
+}
+
+/* --------------------------------------------------------------------------
+   8. CABEÇALHOS DE SEÇÃO E ESTRUTURA DE PÁGINAS INTERNAS
+   -------------------------------------------------------------------------- */
+.ka-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-mist);
+}
+
+.ka-page-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-iris);
+  margin-bottom: 4px;
+}
+
+.ka-page-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--color-studio-slate);
+  margin: 0;
+}
+
+.ka-page-subtitle {
+  font-size: 15px;
+  color: var(--color-iron);
+  margin: 4px 0 0 0;
+}
+
+/* --------------------------------------------------------------------------
+   9. INTERFACE DO ASSISTENTE E CITAÇÕES DOCUMENTAIS
+   -------------------------------------------------------------------------- */
+.ka-chat-message-user {
+  background-color: var(--color-cloud);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-card);
+  padding: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.ka-chat-message-assistant {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-mist);
+  border-left: 4px solid var(--color-iris);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-card);
+  margin-bottom: var(--space-3);
+}
+
+.ka-chat-role {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ka-citation-card {
+  background-color: var(--color-cloud);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-card);
+  padding: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.ka-citation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.ka-citation-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-studio-slate);
+}
+
+.ka-citation-excerpt {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-iron);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-mist);
+  border-radius: var(--radius-input);
+  padding: 12px;
+}
+
+/* --------------------------------------------------------------------------
+   10. RESPONSIVIDADE
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .ka-pipeline-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ka-hero-headline {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ka-pipeline-grid {
+    grid-template-columns: 1fr;
+  }
+  .ka-hero-section {
+    padding: var(--space-4) var(--space-3);
+  }
+  .ka-hero-headline {
+    font-size: 40px;
+  }
+  .block-container {
+    padding-left: var(--space-2) !important;
+    padding-right: var(--space-2) !important;
+  }
+}

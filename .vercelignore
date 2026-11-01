@@ -1,0 +1,16 @@
+.venv/
+venv/
+data/
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+!.env.example
+.streamlit/
+frontend/
+tests/
+docs/
+__pycache__/
+*.pyc
+run_assistant.ps1

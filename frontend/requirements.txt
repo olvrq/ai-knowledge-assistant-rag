@@ -1,0 +1,6 @@
+# =============================================================================
+# AI KNOWLEDGE ASSISTANT — FRONTEND STREAMLIT DEPENDENCIES
+# Detectado automaticamente pelo Streamlit Community Cloud quando o entrypoint é frontend/app.py
+# =============================================================================
+-r ../requirements.txt
+streamlit>=1.39.0

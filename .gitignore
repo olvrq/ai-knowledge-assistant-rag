@@ -1,0 +1,43 @@
+# =============================================================================
+# AI KNOWLEDGE ASSISTANT — GITIGNORE OFICIAL
+# Proteção de variáveis de ambiente, chaves de API, banco local e artefatos
+# =============================================================================
+
+# Variáveis de ambiente e segredos (NUNCA versionar)
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Banco de dados local e uploads de usuários
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Ambientes virtuais Python
+.venv/
+venv/
+env/
+ENV/
+
+# Bytecode e cache Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Vercel e build artifacts
+.vercel/
+dist/
+build/
+*.egg-info/
+
+# IDEs e Sistema Operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

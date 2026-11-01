@@ -1,0 +1,19 @@
+# =============================================================================
+# AI KNOWLEDGE ASSISTANT — BACKEND & CORE DEPENDENCIES (VERCEL COMPATIBLE)
+# Para instalar também o Frontend Streamlit localmente: pip install -r frontend/requirements.txt
+# =============================================================================
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+httpx>=0.27.0
+python-dotenv>=1.0.1
+python-multipart>=0.0.12
+pydantic>=2.9.0
+supabase>=2.9.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-google-genai>=2.0.0
+langchain-text-splitters>=0.3.0
+google-genai>=1.0.0
+pypdf>=5.0.0
+python-docx>=1.1.2
+pytest>=8.0.0
