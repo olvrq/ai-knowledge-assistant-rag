@@ -30,6 +30,7 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       overflow: hidden;
       -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -44,6 +45,87 @@
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: rgba(168, 85, 247, 0.4);
+    }
+
+    /* ===================================================================
+       SUPORTE COMPLETO AO MODO CLARO (html.light) E MODO ESCURO (html.dark)
+       =================================================================== */
+    html.light,
+    html.light body {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+    html.light .bg-slate-950,
+    html.light .bg-slate-950\/50,
+    html.light .bg-slate-950\/70,
+    html.light .bg-slate-950\/80 {
+      background-color: #f8fafc !important;
+    }
+    html.light #sidebar {
+      background-color: rgba(255, 255, 255, 0.96) !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light header {
+      background-color: rgba(255, 255, 255, 0.88) !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light .bg-slate-900,
+    html.light .bg-slate-900\/90,
+    html.light .bg-slate-900\/60,
+    html.light .bg-slate-900\/50,
+    html.light .bg-slate-900\/40 {
+      background-color: #ffffff !important;
+    }
+    html.light .hover\:bg-slate-800:hover,
+    html.light .hover\:bg-slate-800\/80:hover,
+    html.light .hover\:bg-slate-800\/50:hover {
+      background-color: #f1f5f9 !important;
+    }
+    html.light .border-slate-900,
+    html.light .border-slate-800,
+    html.light .border-slate-800\/80,
+    html.light .border-slate-800\/60,
+    html.light .border-slate-700 {
+      border-color: #e2e8f0 !important;
+    }
+    html.light .text-white,
+    html.light .text-slate-100,
+    html.light .text-slate-200 {
+      color: #0f172a !important;
+    }
+    html.light .text-slate-300,
+    html.light .text-slate-400 {
+      color: #475569 !important;
+    }
+    html.light .text-slate-500 {
+      color: #64748b !important;
+    }
+    html.light .bg-purple-950,
+    html.light .bg-purple-950\/60,
+    html.light .bg-purple-950\/70,
+    html.light .bg-purple-950\/50 {
+      background-color: #f3e8ff !important;
+      color: #6b21a8 !important;
+      border-color: #d8b4fe !important;
+    }
+    html.light .text-purple-300,
+    html.light .text-purple-200 {
+      color: #6b21a8 !important;
+    }
+    html.light .text-purple-400 {
+      color: #7c3aed !important;
+    }
+    html.light .bg-purple-600,
+    html.light .bg-purple-600 * {
+      color: #ffffff !important;
+    }
+    html.light .shadow-purple-950 {
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.22) !important;
+    }
+    html.light #chat-input {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
     }
   </style>
 </head>
@@ -226,10 +308,28 @@
           </span>
         </div>
 
-        <div class="flex items-center gap-3 shrink-0">
+        <div class="flex items-center gap-2.5 shrink-0">
+          <!-- Botão Alternar Modo Escuro / Claro -->
+          <button
+            id="btn-theme-toggle"
+            onclick="toggleTheme()"
+            title="Alternar entre Modo Escuro e Modo Claro"
+            class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium border border-slate-800 transition-all flex items-center gap-1.5"
+          >
+            <!-- Ícone Sol (visível no modo escuro para mudar para claro) -->
+            <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400">
+              <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+            </svg>
+            <!-- Ícone Lua (visível no modo claro para mudar para escuro) -->
+            <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden text-purple-600">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+            </svg>
+            <span id="theme-toggle-label">Modo Claro</span>
+          </button>
+
           <button
             onclick="triggerUploadOrViewDocuments()"
-            class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium border border-slate-800 transition-all flex items-center gap-1.5"
+            class="bg-slate-900 hover:bg-slate-800 text-slate-200 px-3.5 py-1.5 rounded-2xl text-xs font-medium border border-slate-800 transition-all flex items-center gap-1.5"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12h14"/><path d="M12 5v14"/>
@@ -409,6 +509,7 @@
   <script>
     const state = {
       isSidebarOpen: true,
+      isDarkMode: true,
       activeView: 'chat', // 'chat' | 'dashboard' | 'documents'
       messages: [],
       activeChat: null,
@@ -466,6 +567,39 @@
         throw new Error(detail);
       }
       return res.json();
+    }
+
+    /* =====================================================================
+       ALTERNÂNCIA DE TEMA (ESCURO / CLARO) COM PERSISTÊNCIA DO USUÁRIO
+       ===================================================================== */
+    function applyTheme(isDark) {
+      state.isDarkMode = isDark;
+      const root = document.documentElement;
+      const sunIcon = document.getElementById('theme-icon-sun');
+      const moonIcon = document.getElementById('theme-icon-moon');
+      const label = document.getElementById('theme-toggle-label');
+
+      if (isDark) {
+        root.classList.add('dark');
+        root.classList.remove('light');
+        if (sunIcon) sunIcon.classList.remove('hidden');
+        if (moonIcon) moonIcon.classList.add('hidden');
+        if (label) label.textContent = 'Modo Claro';
+      } else {
+        root.classList.remove('dark');
+        root.classList.add('light');
+        if (sunIcon) sunIcon.classList.add('hidden');
+        if (moonIcon) moonIcon.classList.remove('hidden');
+        if (label) label.textContent = 'Modo Escuro';
+      }
+
+      try {
+        localStorage.setItem('ka_theme', isDark ? 'dark' : 'light');
+      } catch (_) {}
+    }
+
+    function toggleTheme() {
+      applyTheme(!state.isDarkMode);
     }
 
     /* =====================================================================
@@ -871,6 +1005,12 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const savedTheme = localStorage.getItem('ka_theme');
+        applyTheme(savedTheme ? savedTheme === 'dark' : true);
+      } catch (_) {
+        applyTheme(true);
+      }
       renderChatHistory();
       renderMessages();
       try {
